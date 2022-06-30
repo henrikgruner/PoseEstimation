@@ -1,0 +1,4 @@
+ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'
+Defaulting to user installation because normal site-packages is not writeable
+Requirement already satisfied: setuptools==59.5.0 in /cluster/home/henrgr/.local/lib/python3.8/site-packages (59.5.0)
+slurmstepd: error: *** JOB 3542946 ON idun-05-14 CANCELLED AT 2022-06-20T00:20:13 ***

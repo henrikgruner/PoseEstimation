@@ -1,0 +1,43 @@
+Fri Jun 24 06:13:44 2022       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 510.47.03    Driver Version: 510.47.03    CUDA Version: 11.6     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla P100-PCIE...  On   | 00000000:03:00.0 Off |                    0 |
+| N/A   25C    P0    25W / 250W |      0MiB / 16384MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+|   1  Tesla P100-PCIE...  On   | 00000000:82:00.0 Off |                    0 |
+| N/A   28C    P0    25W / 250W |      0MiB / 16384MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'
+Defaulting to user installation because normal site-packages is not writeable
+Requirement already satisfied: setuptools==59.5.0 in /cluster/home/henrgr/.local/lib/python3.8/site-packages (59.5.0)
+cuda:  True
+count:  2
+names:  ['Tesla P100-PCIE-16GB', 'Tesla P100-PCIE-16GB']
+device ids: [0, 1]
+Traceback (most recent call last):
+  File "main.py", line 296, in <module>
+    dl_train, dl_eval = get_6D_loader_pregen(dataset, batch_size, dataset_dir, shuffle = True)
+  File "../data/dataset.py", line 266, in get_6D_loader_pregen
+    dataset_train = ModelNet6D_pregen2(dataset_dir, train=True)
+  File "../data/dataset.py", line 84, in __init__
+    self.df = pd.read_pickle('homo_test.pkl')
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/pandas/io/pickle.py", line 196, in read_pickle
+    with get_handle(
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/pandas/io/common.py", line 711, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'homo_test.pkl'

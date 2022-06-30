@@ -1,0 +1,105 @@
+ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'
+dataset size: 344
+Traceback (most recent call last):
+  File "main.py", line 292, in <module>
+    train_loss, train_angle_errors, geodesic_train = train(
+  File "main.py", line 169, in train
+    model_out = model(gg)
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 157, in forward
+    out_rmat = compute_rotation_matrix_from_quaternion(out_nd)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 99, in compute_rotation_matrix_from_quaternion
+    quat = normalize_vector(quaternion)
+NameError: name 'normalize_vector' is not defined
+dataset size: 392
+Traceback (most recent call last):
+  File "main.py", line 292, in <module>
+    train_loss, train_angle_errors, geodesic_train = train(
+  File "main.py", line 169, in train
+    model_out = model(gg)
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 157, in forward
+    out_rmat = compute_rotation_matrix_from_quaternion(out_nd)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 99, in compute_rotation_matrix_from_quaternion
+    quat = normalize_vector(quaternion)
+NameError: name 'normalize_vector' is not defined
+dataset size: 200
+Traceback (most recent call last):
+  File "main.py", line 292, in <module>
+    train_loss, train_angle_errors, geodesic_train = train(
+  File "main.py", line 169, in train
+    model_out = model(gg)
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 157, in forward
+    out_rmat = compute_rotation_matrix_from_quaternion(out_nd)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 99, in compute_rotation_matrix_from_quaternion
+    quat = normalize_vector(quaternion)
+NameError: name 'normalize_vector' is not defined
+dataset size: 200
+Traceback (most recent call last):
+  File "main.py", line 292, in <module>
+    train_loss, train_angle_errors, geodesic_train = train(
+  File "main.py", line 169, in train
+    model_out = model(gg)
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 157, in forward
+    out_rmat = compute_rotation_matrix_from_quaternion(out_nd)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 99, in compute_rotation_matrix_from_quaternion
+    quat = normalize_vector(quaternion)
+NameError: name 'normalize_vector' is not defined
+dataset size: 465
+Traceback (most recent call last):
+  File "main.py", line 292, in <module>
+    train_loss, train_angle_errors, geodesic_train = train(
+  File "main.py", line 169, in train
+    model_out = model(gg)
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 157, in forward
+    out_rmat = compute_rotation_matrix_from_quaternion(out_nd)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 99, in compute_rotation_matrix_from_quaternion
+    quat = normalize_vector(quaternion)
+NameError: name 'normalize_vector' is not defined
+dataset size: 200
+Traceback (most recent call last):
+  File "main.py", line 292, in <module>
+    train_loss, train_angle_errors, geodesic_train = train(
+  File "main.py", line 169, in train
+    model_out = model(gg)
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 157, in forward
+    out_rmat = compute_rotation_matrix_from_quaternion(out_nd)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 99, in compute_rotation_matrix_from_quaternion
+    quat = normalize_vector(quaternion)
+NameError: name 'normalize_vector' is not defined
+dataset size: 200
+Traceback (most recent call last):
+  File "main.py", line 292, in <module>
+    train_loss, train_angle_errors, geodesic_train = train(
+  File "main.py", line 169, in train
+    model_out = model(gg)
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 157, in forward
+    out_rmat = compute_rotation_matrix_from_quaternion(out_nd)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 99, in compute_rotation_matrix_from_quaternion
+    quat = normalize_vector(quaternion)
+NameError: name 'normalize_vector' is not defined
+dataset size: 106
+Traceback (most recent call last):
+  File "main.py", line 292, in <module>
+    train_loss, train_angle_errors, geodesic_train = train(
+  File "main.py", line 169, in train
+    model_out = model(gg)
+  File "/cluster/home/henrgr/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 157, in forward
+    out_rmat = compute_rotation_matrix_from_quaternion(out_nd)
+  File "/cluster/home/henrgr/so3master/point_cloud/model_fetch.py", line 99, in compute_rotation_matrix_from_quaternion
+    quat = normalize_vector(quaternion)
+NameError: name 'normalize_vector' is not defined
