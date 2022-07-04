@@ -5,9 +5,9 @@ homeomorphic, hence a mapping function is needed. The code in this section is me
 ### Mapping functions:
 
 1. Euler angles: $f \in \mathbb{R}^3$
-2. Quaternions: $f \in \mathbb{R}^4
-3. Gram Schmidt orthogonalizaion in 5D: $f\in \mathbb{R}^5
-4. Gram Schmidt orthogonalization in 6D: $f \in \mathbb{R}^6
-5. Symmetric orthogonalization via SVD: $f \in \mathbb{R}^9
+2. Quaternions: $f \in \mathbb{R}^4$
+3. Gram Schmidt orthogonalizaion in 5D: $f\in \mathbb{R}^5$
+4. Gram Schmidt orthogonalization in 6D: $f \in \mathbb{R}^6$
+5. Symmetric orthogonalization via SVD: $f \in \mathbb{R}^9$
 6. Direct regression without orthogonalization: $f \in \mathbb{R}^9$. This is not a true rotation representation, as there is no guarantee it will be orthogonal. It is included nonetheless to see how well the network is able to perform without a parametrization function. The output is simply reshaped into $3 \times 3$
 
