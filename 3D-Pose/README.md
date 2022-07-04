@@ -10,7 +10,7 @@ python3 dataset.py
 which will generate pickle classes. Note that this takes upwards of 200-300 GB of memory, hence one can also use [1] method. However this requires changing the code in my project. 
 
 ## Network overview
-The network used was a ResNet-RS101 [2] 
+The network used was a ResNet-RS101 [2], and an overview is illustrated below, with SVD as the rotation representation. 
 
 ![overview](https://github.com/henrikgruner/PoseEstimation/blob/master/3D-Pose/git_imgs/overview.png)
 
