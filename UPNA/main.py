@@ -122,7 +122,7 @@ num_classes = 1
 batch_size = 128
 epochs = 50
 drop_epochs = []
-save_interval = 1
+save_interval = 5
 model_name = 'resnetrs101'
 ngpu = 4
 lr = 0.01
@@ -150,7 +150,6 @@ print("cuda: ", torch.cuda.is_available())
 print("count: ", torch.cuda.device_count())
 print("names: ", device_names)
 print("device ids:", devices)
-classes = ['bathtub', 'table', 'toilet']
 
 dl_train, dl_eval = get_upna_loaders(batch_size, True, '')
 
