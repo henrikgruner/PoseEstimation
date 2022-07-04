@@ -116,8 +116,8 @@ def train_net_pregren(model, opt, dl_train, device, writer_train, iterations=1, 
             # Pass the inputs to the model
             out = model(model_input)
 
-            ex_curr_new = calculate_T_CO_pred(
-                out, ex_curr.to(device), rot_repr='SVD')
+            ex_curr_new = calculate_T_pred(
+                out, ex_curr.to(device),device,  rot_repr='SVD')
 
             outR = ex_curr_new[:,:3,:3].detach().clone()
             angle = angle_error(outR, ex[:,:3,:3]).mean().item()
@@ -177,8 +177,8 @@ def train_net(model, opt, dl_train, device, writer_train, iterations=1, lossfunc
             # Pass the inputs to the mo del
             out = model(model_input)
 
-            ex_curr_new = calculate_T_CO_pred(
-                out, ex_curr.to(device), rot_repr='SVD')
+            ex_curr_new = calculate_T_pred(
+                out, ex_curr.to(device),device, rot_repr='SVD')
 
             # Calculate loss
             loss = compute_disentangled_ADD_L1_loss(
@@ -223,8 +223,8 @@ def test_net(model, dl_eval, device, iterations=1, lossfunc=None):
 
             out = model(model_input)
 
-            ex_curr_new = calculate_T_CO_pred(
-                out, ex_curr.to(device), rot_repr='SVD')
+            ex_curr_new = calculate_T_pred(
+                out, ex_curr.to(device),device, rot_repr='SVD')
 
 
             loss = compute_disentangled_ADD_L1_loss(

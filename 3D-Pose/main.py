@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import ModelNetSO3
 import os
-from helper import save_network
+from helper import save_network, load_network
 from model import ResnetRS
 import numpy as np
 import glob
@@ -164,20 +164,10 @@ def test_SO3(model, opt, dl_eval, device, lossfunc = None, rot_rep = "SVD"):
     return val_loss, angle_errors
 
 
-def load_network(path, model, opt, model_name, out_dim, numclasses):
-    modelcheckpoint = torch.load(path)
 
-    model.load_state_dict(modelcheckpoint['model_state_dict'])
-    opt.load_state_dict(modelcheckpoint['optimizer_state_dict'])
-    epoch = modelcheckpoint['epoch']
-
-    return model, opt, epoch
 
 # Frobenius norm
-
-
 # Brief setup
-
 
 rot_rep = args.rot_rep
 batch_size = 512

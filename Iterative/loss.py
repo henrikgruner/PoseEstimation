@@ -27,7 +27,10 @@ def compute_ADD_L1_loss(TCO_gt, TCO_pred, points, use_batch_mean=True):
 
 
 def compute_disentangled_ADD_L1_loss(T_CO_pred, T_CO_gt, points):
-    # idea from https://github.com/ylabbe/cosypose, but more compact implementation
+    """
+    Taken from https://github.com/olaals/end-to-end-RGB-pose-estimation-baseline 
+    but the original idea is from https://github.com/ylabbe/cosypose, with a more compact implementation 
+    """
 
     disent_T_CO_rot = T_CO_gt.clone()
     disent_T_CO_depth = T_CO_gt.clone()

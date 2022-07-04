@@ -76,11 +76,10 @@ def render_to_batch(cad_ids, classes_id, ex_list, train=True, img_res=300):
 
 
 def worker_render_from_id(i, cad_id, class_id, ex_curr, imgs, dataset='ModelNet40/NormalizedModelNet40', train=True):
-    #print("worker", i)
     img = render_from_id(cad_id, class_id, ex_curr)
     imgs[i, :, :, :] = torchvision.transforms.functional.to_tensor(img)
 
-    #print("worker", i, "finished")
+
 
 
 def render_to_batch_parallel(cad_ids, classes_id, ex_list, train=True, img_res=300):

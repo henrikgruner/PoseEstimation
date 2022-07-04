@@ -22,7 +22,7 @@ def save_network(epoch, model, opt, model_name, path):
     }, PATH)
 
 
-def load_network(path, model, opt, model_name, out_dim, numclasses):
+def load_network(path, model, opt):
     modelcheckpoint = torch.load(path)
 
     model.load_state_dict(modelcheckpoint['model_state_dict'])
