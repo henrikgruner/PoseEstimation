@@ -8,10 +8,21 @@ import torch
 import torch.functional as F
 import torch.nn
 
+"""
+Most of the rotation representation functions are from https://github.com/papagina/RotationContinuity
+    On the Continuity of Rotation Representations in Neural Networks
+    Zhou et al. CVPR19
+    https://zhouyisjtu.github.io/project_rotation/rotation.html
+"""
+
+
 def symmetric_orthogonalization(x):
     """Maps 9D input vectors onto SO(3) via symmetric orthogonalization.
     x: should have size [batch_size, 9]
     Output has size [batch_size, 3, 3], where each inner 3x3 matrix is in SO(3).
+
+    This is from Levinson et Al.
+    
     """
     m = x.view(-1, 3, 3)
     d = m.device
@@ -43,6 +54,12 @@ def compute_rotation_matrix_from_ortho6d(poses):
     return matrix
 
 def normalize_vector( v):
+    """
+    Code from https://github.com/papagina/RotationContinuity
+    On the Continuity of Rotation Representations in Neural Networks
+    Zhou et al. CVPR19
+    https://zhouyisjtu.github.io/project_rotation/rotation.html
+    """
     batch=v.shape[0]
     v_mag = torch.sqrt(v.pow(2).sum(1))# batch
     v_mag = torch.max(v_mag, torch.autograd.Variable(torch.FloatTensor([1e-8]).to(v.device)))
@@ -52,6 +69,12 @@ def normalize_vector( v):
     
 # u, v batch*n
 def cross_product( u, v):
+    """
+    Code from https://github.com/papagina/RotationContinuity
+    On the Continuity of Rotation Representations in Neural Networks
+    Zhou et al. CVPR19
+    https://zhouyisjtu.github.io/project_rotation/rotation.html
+    """
     batch = u.shape[0]
     #print (u.shape)
     #print (v.shape)
@@ -67,7 +90,11 @@ def cross_product( u, v):
 def stereographic_unproject(a, axis=None):
     """
 	Inverse of stereographic projection: increases dimension by one.
-	"""
+    Code from https://github.com/papagina/RotationContinuity
+    On the Continuity of Rotation Representations in Neural Networks
+    Zhou et al. CVPR19
+    https://zhouyisjtu.github.io/project_rotation/rotation.html
+    """
     batch=a.shape[0]
     if axis is None:
         axis = a.shape[1]
@@ -81,6 +108,12 @@ def stereographic_unproject(a, axis=None):
     return ans
 
 def compute_rotation_matrix_from_euler(euler):
+    """
+    Code from https://github.com/papagina/RotationContinuity
+    On the Continuity of Rotation Representations in Neural Networks
+    Zhou et al. CVPR19
+    https://zhouyisjtu.github.io/project_rotation/rotation.html
+    """
     batch=euler.shape[0]
         
     c1=torch.cos(euler[:,0]).view(batch,1)#batch*1 
@@ -103,6 +136,12 @@ def compute_rotation_matrix_from_euler(euler):
 #out batch*3*3
 
 def compute_rotation_matrix_from_ortho5d(a):
+    """
+    Code from https://github.com/papagina/RotationContinuity
+    On the Continuity of Rotation Representations in Neural Networks
+    Zhou et al. CVPR19
+    https://zhouyisjtu.github.io/project_rotation/rotation.html
+    """
     batch = a.shape[0]
     proj_scale_np = np.array([np.sqrt(2)+1, np.sqrt(2)+1, np.sqrt(2)]) #3
     proj_scale = torch.autograd.Variable(torch.FloatTensor(proj_scale_np).cuda()).view(1,3).repeat(batch,1) #batch,3
@@ -116,6 +155,12 @@ def compute_rotation_matrix_from_ortho5d(a):
 
 
 def compute_rotation_matrix_from_quaternion(quaternion):
+    """
+    Code from https://github.com/papagina/RotationContinuity
+    On the Continuity of Rotation Representations in Neural Networks
+    Zhou et al. CVPR19
+    https://zhouyisjtu.github.io/project_rotation/rotation.html
+    """
     batch=quaternion.shape[0]
     
     quat = normalize_vector(quaternion)
@@ -148,20 +193,9 @@ class Model(nn.Module):
     def __init__(self, representation="SVD"):
         super(Model, self).__init__()
         self.representation = representation
-        if(representation == "SVD"):
-            self.out_channel = 9
-        elif(representation == "6D"):
-            self.out_channel = 6
-        elif(representation == "5D"):
-            self.out_channel = 5
-        elif(representation == "Quat"):
-            self.out_channel = 4
-        elif(representation == "Euler"):
-            self.out_channel = 3
-        elif(representation == "Direct"):
-            self.out_channel = 9
-
-        
+        self.dimension = {"SVD":9, "6D":6, "5D": 5, "Quat": 4, "Euler": 3, "Direct": 9}
+        self.func = {"SVD":symmetric_orthogonalization, "6D":compute_rotation_matrix_from_ortho6d, "5D": compute_rotation_matrix_from_ortho5d, "Quat": compute_rotation_matrix_from_quaternion, "Euler": compute_rotation_matrix_from_euler}
+        self.out_channel = self.dimension[representation]
 
         self.fc1 = nn.Linear(9, 128)  # 5*5 from image dimension
         self.fc2 = nn.Linear(128, 64)
@@ -178,19 +212,14 @@ class Model(nn.Module):
         x = torch.nn.functional.relu(self.fc2(x))
         x = self.fc3(x)
 
-        if(self.representation == "SVD"):
-            out = symmetric_orthogonalization(x)
-        elif(self.representation == "6D"):
-            out = compute_rotation_matrix_from_ortho6d(x)
-        elif(self.representation == "5D"):
-            out = compute_rotation_matrix_from_ortho5d(x)
-        elif(self.representation == "Quat"):
-            out = compute_rotation_matrix_from_quaternion(x)
-        elif(self.representation == "Euler"):
-            out = compute_rotation_matrix_from_euler(x)
-        elif(self.representation == "Direct"):
+        if(self.representation == "Direct"):
             out = x.view(-1,3,3)
-
+        else:
+            try:
+                out = self.func[self.representation](x)
+            except Exception as err:
+                print("Rotation could not be found")
+            
         return out
 
 

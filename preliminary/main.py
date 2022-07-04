@@ -115,8 +115,8 @@ results ={'Euler':[], 'Quat': [], 'SVD': [], '5D':[], '6D': [], 'Direct': []}
 for i,max_angle in enumerate(max_angles):
 
     dataset = MyDataset(max_angle, 30000)      
-
     testdata = MyDataset(max_angle, 6000)
+
     train_loader = DataLoader(
     dataset,
     batch_size=128,
@@ -130,6 +130,7 @@ for i,max_angle in enumerate(max_angles):
     drop_last = True)
 
     for key in results.keys():
+
         if key == 'Direct':
             direct = True
         else:
@@ -137,12 +138,7 @@ for i,max_angle in enumerate(max_angles):
         results[key], test_angle = train_model(Model(representation = key), train_loader, test_loader, direct = direct)
         print(key,': ',test_angle)
         print(key,': ', results[key])
-    #results['Euler'] = train_model(Euler, loader)
-    #results['Quat'] = train_model(Quat, loader)
-    #results['SVD'] = train_model(SVD, loader)
-    #results['5D'] = train_model(Gs5D, loader)
-    #results['6D'] = train_model(Gs6D, loader)
-    #results['Direct'] = train_model(Direct, loader)
+   
 
     plot(results, pltangles[i])
     plot(results, pltangles[i], restricted= True)
