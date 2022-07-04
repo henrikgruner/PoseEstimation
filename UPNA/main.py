@@ -1,20 +1,18 @@
 import sys
-sys.path.append('../models')
+sys.path.append('../model')
 sys.path.append('../data')
 sys.path.append('..')
-sys.path.append('logs')
 sys.path.append('../6D')
 sys.path.append('../Fresh')
 
-from resnet import resnet50, resnet101, ResnetHead
-from loss import loss_frobenius
+from resnet_models import resnet50, resnet101, ResnetHead
 import torch
 import time
 import torch.nn as nn
 import torch.nn.functional as F
-import ModelNetSO3
+
 import os
-from helper import save_network
+
 from model import ResnetRS
 import numpy as np
 import glob
@@ -25,6 +23,12 @@ from dataloader import get_upna_loaders
 from rotation_representation import *
 
 
+
+def loss_frobenius(R_pred, R_true):
+    difference = R_true - R_pred
+    frob_norm = torch.linalg.matrix_norm(difference, ord='fro')
+
+    return frob_norm.mean()
 
 
 def train_SO3(model, opt, dl_train, device, lossfunc=None):
@@ -118,7 +122,7 @@ def load_network(path, model, opt, model_name, out_dim, numclasses):
 # Brief setup
 rot_rep = 'SVD'
 rot_dim = 6
-num_classes = 1
+num_classes = 9
 batch_size = 128
 epochs = 50
 drop_epochs = []
@@ -153,9 +157,9 @@ print("device ids:", devices)
 
 dl_train, dl_eval = get_upna_loaders(batch_size, True, '')
 
-
 model = ResnetRS.create_pretrained(
-    model_name, in_ch=3, num_classes=num_classes)
+    model_name, in_ch=3, out_features = 9, num_classes=9)
+
 
 '''
 base = resnet101(pretrained=True, progress=True)

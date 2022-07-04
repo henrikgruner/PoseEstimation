@@ -209,7 +209,7 @@ print("device ids:", devices)
 dl_train, dl_eval = get_modelnet_loader(batch_size,True, dataset_dir = '../data/')
 
 model = ResnetRS.create_pretrained(
-    model_name, in_ch=3,out_features = rot_dim[rot_rep], num_classes=rot_dim[rot_rep],)
+    model_name, in_ch=3,out_features = rot_dim[rot_rep], num_classes=rot_dim[rot_rep])
 
 model = nn.DataParallel(model, device_ids=devices)
 model = model.to(device)
