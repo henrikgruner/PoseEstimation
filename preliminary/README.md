@@ -6,7 +6,7 @@ homeomorphic, hence a mapping function is needed. The code in this section is me
 
 
 <ol>
-  <li>Euler angles: $f \in \mathbb{R}^3$</li>
+  <li>Euler angles: $$f \in \mathbb{R}^3$$</li>
   <li>Quaternions: $f \in \mathbb{R}^4</li>
   <li>Gram Schmidt orthogonalizaion in 5D: $f\in \mathbb{R}^5</li>
   <li> Gram Schmidt orthogonalization in 6D: $f \in \mathbb{R}^</li>
