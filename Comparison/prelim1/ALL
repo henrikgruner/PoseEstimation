@@ -1,0 +1,20 @@
+ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'
+Defaulting to user installation because normal site-packages is not writeable
+Requirement already satisfied: setuptools==59.5.0 in /cluster/home/henrgr/.local/lib/python3.8/site-packages (59.5.0)
+Euler :  0.5448320146143996
+main.py:78: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  R = torch.tensor(R).to(device)
+Quat :  0.3185931745537877
+SVD :  0.30558643113332673
+5D :  0.5410657310565121
+6D :  0.3711891658269895
+Direct :  2.33839709272811
+Euler :  1.939990899510932
+main.py:78: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  R = torch.tensor(R).to(device)
+Quat :  0.5364446894476566
+SVD :  0.44099531992397506
+5D :  0.7433431781201721
+6D :  0.513026173283202
+Direct :  2.840711767451476
+slurmstepd: error: *** JOB 3551815 ON idun-04-15 CANCELLED AT 2022-06-23T02:45:12 ***
