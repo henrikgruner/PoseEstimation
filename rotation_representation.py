@@ -206,6 +206,21 @@ def symmetric_orthogonalization(x):
     return r
 
 
+def angle_error(t_R1, t_R2):
+    ret = torch.empty((t_R1.shape[0]), dtype=t_R1.dtype, device=t_R1.device)
+    rotation_offset = torch.matmul(
+        t_R1.transpose(1, 2).double(), t_R2.double())
+    tr_R = torch.sum(rotation_offset.view(-1, 9)
+                     [:, ::4], axis=1)  # batch trace
+    cos_angle = (tr_R - 1) / 2
+    if torch.any(cos_angle < -1.1) or torch.any(cos_angle > 1.1):
+        raise ValueError(
+            "angle out of range, input probably not proper rotation matrices")
+    cos_angle = torch.clamp(cos_angle, -1, 1)
+    angle = torch.acos(cos_angle)
+    return angle * (180 / np.pi)
+    
+
 def so3_exp_map(
     log_rot: torch.Tensor, eps: float = 0.0001
 ):

@@ -22,64 +22,9 @@ from torch.utils.tensorboard import SummaryWriter
 import torchvision
 from torch import Tensor
 from dataloader import get_upna_loaders
+from rotation_representation import *
 
 
-# TODO - Save net per tenth
-
-def symmetric_orthogonalization(x):
-    """
-    Code from https://github.com/amakadia/svd_for_pose
-    Maps 9D input vectors onto SO(3) via symmetric orthogonalization.
-    x: should have size [batch_size, 9]
-    Output has size [batch_size, 3, 3], where each inner 3x3 matrix is in SO(3).
-    """
-    m = x.view(-1, 3, 3)
-    u, s, v = torch.svd(m)
-    vt = torch.transpose(v, 1, 2)
-    det = torch.det(torch.matmul(u, vt))
-    det = det.view(-1, 1, 1)
-    vt = torch.cat((vt[:, :2, :], vt[:, -1:, :] * det), 1)
-    r = torch.matmul(u, vt)
-    return r
-
-
-def compute_rotation_matrix_from_ortho6d(poses):
-    """
-    Code from https://github.com/papagina/RotationContinuity
-    On the Continuity of Rotation Representations in Neural Networks
-    Zhou et al. CVPR19
-    https://zhouyisjtu.github.io/project_rotation/rotation.html
-    """
-    assert poses.shape[-1] == 6
-    x_raw = poses[..., 0:3]
-    y_raw = poses[..., 3:6]
-    x = x_raw / torch.norm(x_raw, p=2, dim=-1, keepdim=True)
-    z = torch.cross(x, y_raw, dim=-1)
-    z = z / torch.norm(z, p=2, dim=-1, keepdim=True)
-    y = torch.cross(z, x, dim=-1)
-    matrix = torch.stack((x, y, z), -1)
-    return matrix
-
-
-def angle_error(t_R1, t_R2):
-    ret = torch.empty((t_R1.shape[0]), dtype=t_R1.dtype, device=t_R1.device)
-    rotation_offset = torch.matmul(
-        t_R1.transpose(1, 2).double(), t_R2.double())
-    tr_R = torch.sum(rotation_offset.view(-1, 9)
-                     [:, ::4], axis=1)  # batch trace
-    cos_angle = (tr_R - 1) / 2
-    if torch.any(cos_angle < -1.1) or torch.any(cos_angle > 1.1):
-        raise ValueError(
-            "angle out of range, input probably not proper rotation matrices")
-    cos_angle = torch.clamp(cos_angle, -1, 1)
-    angle = torch.acos(cos_angle)
-    return angle * (180 / np.pi)
-
-
-'''
-Taken from:
-https://github.com/airalcorn2/pytorch-geodesic-loss/blob/master/geodesic_loss.py
-'''
 
 
 def train_SO3(model, opt, dl_train, device, lossfunc=None):
