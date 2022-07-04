@@ -10,7 +10,7 @@ scipy==1.5.3
 matplotlib==3.4.3
 spatialmath_python==1.0.0
 tqdm==4.64.0
-numpy==1.19.5
+numpy==1.22.0
 Pillow==9.2.0
 representations==1.0.3
 resnet==0.1
