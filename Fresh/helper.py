@@ -37,7 +37,8 @@ sys.path.append('../models')
 sys.path.append('../data')
 sys.path.append('../6D')
 sys.path.append('..')
-sys.path.append('ModelNet40-norm-ply')
+sys.path.append('../CosyPose/')
+sys.path.append('../CosyPose/ModelNet40-norm-ply')
 sys.path.append('logs')
 from model import ResnetRS
 from loss import loss_frobenius
@@ -137,7 +138,7 @@ def get_scene(mesh, ex, flen, img_res, sw):
     vx = vy = img_res / 2
 
     camera = pyrender.IntrinsicsCamera(fx, fy, vx, vy)
-    light = pyrender.SpotLight(color=np.ones(3), intensity=30.0,
+    light = pyrender.SpotLight(color=np.ones(3), intensity=15.0,
                                innerConeAngle=np.pi / 8.0,
                                outerConeAngle=np.pi / 3.0)
     scene.add(light, pose=ex)
@@ -146,27 +147,26 @@ def get_scene(mesh, ex, flen, img_res, sw):
     return scene
 
 # 6D/ModelNet40/NormalizedModelNet40/sofa/train/sofa_0681.ply
-def render_from_id(cad_id, class_id, ex_curr,foldergg, dataset='ModelNet40-norm-ply', train=False):
+def render_from_id(class_str, ex_curr,dataset='../CosyPose/ModelNet40-norm-ply', train=False):
 
     if(train):
         folder = 'train'
     else:
         folder = 'test'
 
-    class_str = 'toilet'
+    classes = ['bathtub', 'bed', 'desk', 'dresser',
+            'monitor', 'night_stand', 'chair', 'sofa', 'table', 'toilet']
+    Class = class_str.split('_')[0]
 
 
-    filename = class_str + '_'+str(class_id).zfill(4)+'.ply'
+    filename = class_str+'.ply'
 
-    path = os.path.join(dataset, class_str, folder, filename)
-
+    path = os.path.join(dataset, Class, folder, filename)
+    print(path)
     mesh_org = tm.load(path)
     mesh = pyrender.Mesh.from_trimesh(mesh_org)
     img = render_image(mesh, ex_curr)
-    plt.imshow(img)
-    plt.title(str(i))
-    plt.savefig(foldergg+'/'+str(i))
-    plt.close()
+
 
       
     return img
@@ -185,24 +185,36 @@ def render_image(mesh, ex, flen=112, sw=112, img_res=224):
 
 
 
-# Brief setup
-batch_size = 1
-dataset = 'SO3'
-dataset_dir = '../data/datasets/'
+if __name__ == '__main__':
+
+    classes = ['bathtub', 'bed', 'desk', 'dresser',
+            'monitor', 'night_stand', 'chair', 'sofa', 'table', 'toilet']
+    classes = ['toilet']
+    path_svd = '../Fresh/logs/run026/saved_models/resnetrs101_state_dict_47.pkl'
+    path_gs = '../Fresh/logs/run027/saved_models/resnetrs101_state_dict_32.pkl'
+    if __name__ == '__main__':
+        viz(path_svd, path_gs, classes) 
+    # automatically find the latest run folder
 
 
-model_name = 'resnetrs101'
+    # Brief setup
+    batch_size = 1
+    dataset = 'SO3'
+    dataset_dir = '../data/datasets/'
 
 
-device = torch.device("cuda" if(
-    torch.cuda.is_available()) else "cpu")
-devices = [d for d in range(torch.cuda.device_count())]
-device_names = [torch.cuda.get_device_name(d) for d in devices]
+    model_name = 'resnetrs101'
 
-print("cuda: ", torch.cuda.is_available())
-print("count: ", torch.cuda.device_count())
-print("names: ", device_names)
-print("device ids:", devices)
+
+    device = torch.device("cuda" if(
+        torch.cuda.is_available()) else "cpu")
+    devices = [d for d in range(torch.cuda.device_count())]
+    device_names = [torch.cuda.get_device_name(d) for d in devices]
+
+    print("cuda: ", torch.cuda.is_available())
+    print("count: ", torch.cuda.device_count())
+    print("names: ", device_names)
+    print("device ids:", devices)
 
 # SOFA
 
@@ -282,7 +294,7 @@ def viz(path_svd, path_gs, classes):
         ex_in[:, 2, 3] = -5
         #ex[:, 3, 3] = torch.tensor(1)
         #render_from_id(cad_id, 0, ex.to('cpu').numpy()[0], foldergg = 'model')
-        render_from_id(cad_id, 345, ex_in.to('cpu').numpy()[0], foldergg = 'true')
+        render_from_id(345, 5, ex_in.to('cpu').numpy()[0], foldergg = 'true')
         plt.imshow(img)
         plt.savefig("org"+str(index))
         plt.close()
@@ -296,12 +308,3 @@ def viz(path_svd, path_gs, classes):
         #print(cad_id)
         #exit()
 
-
-classes = ['bathtub', 'bed', 'desk', 'dresser',
-           'monitor', 'night_stand', 'chair', 'sofa', 'table', 'toilet']
-classes = ['toilet']
-path_svd = '../Fresh/logs/run026/saved_models/resnetrs101_state_dict_47.pkl'
-path_gs = '../Fresh/logs/run027/saved_models/resnetrs101_state_dict_32.pkl'
-if __name__ == '__main__':
-    viz(path_svd, path_gs, classes) 
-# automatically find the latest run folder

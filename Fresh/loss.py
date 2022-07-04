@@ -15,9 +15,12 @@ def rotate_by_180(R_guess):
     Rx = sm.SO3.Rx(np.pi)
     Ry = sm.SO3.Ry(np.pi)
     Rz = sm.SO3.Rz(np.pi)
-    Rx = torch.tensor(R_guess.to('cpu') @ Rx.data[0], dtype=torch.float64)
-    Ry = torch.tensor(R_guess.to('cpu') @ Ry.data[0], dtype=torch.float64)
-    Rz = torch.tensor(R_guess.to('cpu') @ Rz.data[0], dtype=torch.float64)
+    Rx = torch.tensor(R_guess.detach().to('cpu') @
+                      Rx.data[0], dtype=torch.float64)
+    Ry = torch.tensor(R_guess.detach().to('cpu') @
+                      Ry.data[0], dtype=torch.float64)
+    Rz = torch.tensor(R_guess.detach().to('cpu') @
+                      Rz.data[0], dtype=torch.float64)
     return Rx, Ry, Rz
 
 

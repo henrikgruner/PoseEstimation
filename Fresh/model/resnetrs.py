@@ -45,7 +45,7 @@ DEFAULT_CFG = {
 
 
 class Resnet(nn.Module):
-    def __init__(self, block, layers, out_features=9, num_classes=1000, in_ch=3, stem_width=64,
+    def __init__(self, block, layers, out_features=6, num_classes=1000, in_ch=3, stem_width=64,
                  down_kernel_size=1, actn=nn.ReLU, norm_layer=nn.BatchNorm2d,
                  seblock=True, reduction_ratio=0.25, dropout_ratio=0.,
                  stochastic_depth_ratio=0., zero_init_last_bn=True):
@@ -61,7 +61,7 @@ class Resnet(nn.Module):
         self.make_layers(block, layers, channels, stem_width * 2,
                          down_kernel_size, seblock, reduction_ratio)
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(512 * block.expansion, out_features, bias=True)
+        self.fc = nn.Linear(512 * block.expansion, 6, bias=True)
 
     def make_layers(self, block, nlayers, channels, inplanes, kernel_size=1,
                     seblock=True, reduction_ratio=0.25):
@@ -170,7 +170,7 @@ class ResnetRS():
         return cfg
 
     @classmethod
-    def create_pretrained(cls, name, in_ch=0, num_classes=0, drop_rate=0.0):
+    def create_pretrained(cls, name, in_ch=0, num_classes=0, out_features = 9, drop_rate=0.0):
         if not ResnetRS._is_valid_model_name(name):
             raise ValueError('Available pretrained models: ' +
                              ', '.join(PRETRAINED_MODELS))
@@ -183,7 +183,7 @@ class ResnetRS():
             cfg['stochastic_depth_rate'] = drop_rate
 
         url = ResnetRS._get_url(name)
-        model = Resnet(cfg['block'], cfg['layers'], num_classes=num_classes,
+        model = Resnet(cfg['block'], cfg['layers'], num_classes=num_classes,out_features = 9,
                        in_ch=in_ch, stem_width=cfg['stem_width'],
                        down_kernel_size=cfg['down_kernel_size'],
                        actn=cfg['actn'], norm_layer=cfg['norm_layer'],

@@ -8,6 +8,7 @@ from model import ResnetRS
 from loss import loss_frobenius, rotate_by_180
 import torch
 import time
+from dataloader import get_modelnet_loader
 import torch.nn as nn
 import torch.nn.functional as F
 import ModelNetSO3
@@ -19,9 +20,50 @@ import glob
 from dataset import get_modelnet_loaders
 from torch.utils.tensorboard import SummaryWriter
 import torchvision
-from torch import Tensor
+import argparse
+from torch import Tensor 
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument("-r", "--rot_rep", type=str, default='SVD', help="category")
 
+args = arg_parser.parse_args()
 
+def compute_geodesic_distance_from_two_matrices(m1, m2):
+    batch=m1.shape[0]
+    m = torch.bmm(m1, m2.transpose(1,2)) #batch*3*3
+    
+    cos = (  m[:,0,0] + m[:,1,1] + m[:,2,2] - 1 )/2
+    cos = torch.min(cos, torch.autograd.Variable(torch.ones(batch).cuda()) )
+    cos = torch.max(cos, torch.autograd.Variable(torch.ones(batch).cuda())*-1 )
+    
+    
+    theta = torch.acos(cos)
+    
+    #theta = torch.min(theta, 2*np.pi - theta)
+    
+    
+    return theta
+
+def normalize_vector( v):
+    batch=v.shape[0]
+    v_mag = torch.sqrt(v.pow(2).sum(1))# batch
+    v_mag = torch.max(v_mag, torch.autograd.Variable(torch.FloatTensor([1e-8]).to(v.device)))
+    v_mag = v_mag.view(batch,1).expand(batch,v.shape[1])
+    v = v/v_mag
+    return v
+    
+# u, v batch*n
+def cross_product( u, v):
+    batch = u.shape[0]
+    #print (u.shape)
+    #print (v.shape)
+    i = u[:,1]*v[:,2] - u[:,2]*v[:,1]
+    j = u[:,2]*v[:,0] - u[:,0]*v[:,2]
+    k = u[:,0]*v[:,1] - u[:,1]*v[:,0]
+        
+    out = torch.cat((i.view(batch,1), j.view(batch,1), k.view(batch,1)),1)#batch*3
+        
+    return out
+        
 
 # TODO - Save net per tenth
 
@@ -60,7 +102,8 @@ def compute_rotation_matrix_from_ortho6d(poses):
 
 def angle_error(t_R1, t_R2):
     ret = torch.empty((t_R1.shape[0]), dtype=t_R1.dtype, device=t_R1.device)
-    rotation_offset = torch.matmul(t_R1.transpose(1, 2), t_R2)
+    rotation_offset = torch.matmul(
+        t_R1.transpose(1, 2).double(), t_R2.double())
     tr_R = torch.sum(rotation_offset.view(-1, 9)
                      [:, ::4], axis=1)  # batch trace
     cos_angle = (tr_R - 1) / 2
@@ -78,48 +121,111 @@ Taken from:
 https://github.com/airalcorn2/pytorch-geodesic-loss/blob/master/geodesic_loss.py
 '''
 
-class GeodesicLoss(nn.Module):
-    r"""Creates a criterion that measures the distance between rotation matrices, which is
-    useful for pose estimation problems.
-    The distance ranges from 0 to :math:`pi`.
-    See: http://www.boris-belousov.net/2016/12/01/quat-dist/#using-rotation-matrices and:
-    "Metrics for 3D Rotations: Comparison and Analysis" (https://link.springer.com/article/10.1007/s10851-009-0161-2).
-    Both `input` and `target` consist of rotation matrices, i.e., they have to be Tensors
-    of size :math:`(minibatch, 3, 3)`.
-    The loss can be described as:
-    .. math::
-        \text{loss}(R_{S}, R_{T}) = \arccos\left(\frac{\text{tr} (R_{S} R_{T}^{T}) - 1}{2}\right)
-    Args:
-        eps (float, optional): term to improve numerical stability (default: 1e-7). See:
-            https://github.com/pytorch/pytorch/issues/8069.
-        reduction (string, optional): Specifies the reduction to apply to the output:
-            ``'none'`` | ``'mean'`` | ``'sum'``. ``'none'``: no reduction will
-            be applied, ``'mean'``: the weighted mean of the output is taken,
-            ``'sum'``: the output will be summed. Default: ``'mean'``
-    Shape:
-        - Input: Shape :math:`(N, 3, 3)`.
-        - Target: Shape :math:`(N, 3, 3)`.
-        - Output: If :attr:`reduction` is ``'none'``, then :math:`(N)`. Otherwise, scalar.
+def normalize_vector( v):
+    batch=v.shape[0]
+    v_mag = torch.sqrt(v.pow(2).sum(1))# batch
+    v_mag = torch.max(v_mag, torch.autograd.Variable(torch.FloatTensor([1e-8]).to(v.device)))
+    v_mag = v_mag.view(batch,1).expand(batch,v.shape[1])
+    v = v/v_mag
+    return v
+    
+# u, v batch*n
+def cross_product( u, v):
+    batch = u.shape[0]
+    #print (u.shape)
+    #print (v.shape)
+    i = u[:,1]*v[:,2] - u[:,2]*v[:,1]
+    j = u[:,2]*v[:,0] - u[:,0]*v[:,2]
+    k = u[:,0]*v[:,1] - u[:,1]*v[:,0]
+        
+    out = torch.cat((i.view(batch,1), j.view(batch,1), k.view(batch,1)),1)#batch*3
+        
+    return out
+        
+
+def stereographic_unproject(a, axis=None):
     """
+	Inverse of stereographic projection: increases dimension by one.
+	"""
+    batch=a.shape[0]
+    if axis is None:
+        axis = a.shape[1]
+    s2 = torch.pow(a,2).sum(1) #batch
+    ans = torch.autograd.Variable(torch.zeros(batch, a.shape[1]+1).cuda()) #batch*6
+    unproj = 2*a/(s2+1).view(batch,1).repeat(1,a.shape[1]) #batch*5
+    if(axis>0):
+        ans[:,:axis] = unproj[:,:axis] #batch*(axis-0)
+    ans[:,axis] = (s2-1)/(s2+1) #batch
+    ans[:,axis+1:] = unproj[:,axis:]	 #batch*(5-axis)		# Note that this is a no-op if the default option (last axis) is used
+    return ans
 
-    def __init__(self, eps: float = 1e-7, reduction: str = "mean") -> None:
-        super().__init__()
-        self.eps = eps
-        self.reduction = reduction
+def compute_rotation_matrix_from_euler(euler):
+    batch=euler.shape[0]
+        
+    c1=torch.cos(euler[:,0]).view(batch,1)#batch*1 
+    s1=torch.sin(euler[:,0]).view(batch,1)#batch*1 
+    c2=torch.cos(euler[:,2]).view(batch,1)#batch*1 
+    s2=torch.sin(euler[:,2]).view(batch,1)#batch*1 
+    c3=torch.cos(euler[:,1]).view(batch,1)#batch*1 
+    s3=torch.sin(euler[:,1]).view(batch,1)#batch*1 
+        
+    row1=torch.cat((c2*c3,          -s2,    c2*s3         ), 1).view(-1,1,3) #batch*1*3
+    row2=torch.cat((c1*s2*c3+s1*s3, c1*c2,  c1*s2*s3-s1*c3), 1).view(-1,1,3) #batch*1*3
+    row3=torch.cat((s1*s2*c3-c1*s3, s1*c2,  s1*s2*s3+c1*c3), 1).view(-1,1,3) #batch*1*3
+        
+    matrix = torch.cat((row1, row2, row3), 1) #batch*3*3
+     
+        
+    return matrix
 
-    def forward(self, input: Tensor, target: Tensor) -> Tensor:
-        R_diffs = input @ target.permute(0, 2, 1)
-        # See: https://github.com/pytorch/pytorch/issues/7500#issuecomment-502122839.
-        traces = R_diffs.diagonal(dim1=-2, dim2=-1).sum(-1)
-        dists = torch.acos(torch.clamp((traces - 1) / 2, -1 + self.eps, 1 - self.eps))
-        if self.reduction == "none":
-            return dists
-        elif self.reduction == "mean":
-            return dists.mean()
-        elif self.reduction == "sum":
-            return dists.sum()
+#a batch*5
+#out batch*3*3
 
-def train_SO3(model, opt, dl_train, device, lossfunc = None):
+def compute_rotation_matrix_from_ortho5d(a):
+    batch = a.shape[0]
+    proj_scale_np = np.array([np.sqrt(2)+1, np.sqrt(2)+1, np.sqrt(2)]) #3
+    proj_scale = torch.autograd.Variable(torch.FloatTensor(proj_scale_np).cuda()).view(1,3).repeat(batch,1) #batch,3
+    
+    u = stereographic_unproject(a[:, 2:5] * proj_scale, axis=0)#batch*4
+    norm = torch.sqrt(torch.pow(u[:,1:],2).sum(1)) #batch
+    u = u/ norm.view(batch,1).repeat(1,u.shape[1]) #batch*4
+    b = torch.cat((a[:,0:2], u),1)#batch*6
+    matrix = compute_rotation_matrix_from_ortho6d(b)
+    return matrix
+
+
+def compute_rotation_matrix_from_quaternion(quaternion):
+    batch=quaternion.shape[0]
+    
+    quat = normalize_vector(quaternion)
+    
+    qw = quat[...,0].view(batch, 1)
+    qx = quat[...,1].view(batch, 1)
+    qy = quat[...,2].view(batch, 1)
+    qz = quat[...,3].view(batch, 1)
+
+    # Unit quaternion rotation matrices computatation  
+    xx = qx*qx
+    yy = qy*qy
+    zz = qz*qz
+    xy = qx*qy
+    xz = qx*qz
+    yz = qy*qz
+    xw = qx*qw
+    yw = qy*qw
+    zw = qz*qw
+    
+    row0 = torch.cat((1-2*yy-2*zz, 2*xy - 2*zw, 2*xz + 2*yw), 1) #batch*3
+    row1 = torch.cat((2*xy+ 2*zw,  1-2*xx-2*zz, 2*yz-2*xw  ), 1) #batch*3
+    row2 = torch.cat((2*xz-2*yw,   2*yz+2*xw,   1-2*xx-2*yy), 1) #batch*3
+    
+    matrix = torch.cat((row0.view(batch, 1, 3), row1.view(batch,1,3), row2.view(batch,1,3)),1) #batch*3*3
+    
+    return matrix    
+
+
+
+def train_SO3(model, opt, dl_train, device, lossfunc = None, rot_rep = "SVD"):
     '''
         input:
         model : network
@@ -130,7 +236,7 @@ def train_SO3(model, opt, dl_train, device, lossfunc = None):
     model.train()
     epoch_loss = []
     angle_errors = []
-    for index, (img, ex, _, _, _, _) in enumerate(dl_train):
+    for index, (img, ex, _, _, _) in enumerate(dl_train):
         opt.zero_grad()
         img = img.to(device)
         # rotation matrix
@@ -139,41 +245,53 @@ def train_SO3(model, opt, dl_train, device, lossfunc = None):
         # preditc rot matrix
 
         out = model(img)
-        #out = compute_rotation_matrix_from_ortho6d(out)
-        out = symmetric_orthogonalization(out)
+
+        if(rot_rep == "SVD"):
+            out = symmetric_orthogonalization(out)
+        elif(rot_rep == "6D"):
+            out = compute_rotation_matrix_from_ortho6d(out)
+        elif(rot_rep == "5D"):
+            out = compute_rotation_matrix_from_ortho5d(out)
+        elif(rot_rep == "quat"):
+            out = compute_rotation_matrix_from_quaternion(out)
+        
 
         angle = angle_error(out, R).mean().item()
+        '''
+        if(angle > 140):
+            outx, outy, outz = rotate_by_180(
+                    out)
 
-        outx,outy,outz = rotate_by_180(out)
+            anglex = angle_error(outx.unsqueeze(dim=0).to(
+                'cuda').double(), R).mean().item()
 
+            angley = angle_error(outy.unsqueeze(dim=0).to(
+                'cuda').double(), R).mean().item()
 
-        angley = angle_error(outy.to(
-                    'cuda').double(), R).mean().item()
+            anglez = angle_error(outz.unsqueeze(dim=0).to(
+                'cuda').double(), R).mean().item()
 
+            angles = [anglex,angley,anglez]
 
+            index_min = np.argmin(angles)
 
-        for i in range(out.shape[0]):
-            if(angley < angle):
-                out[i] = outy[i]
+            out_out = [outx,outy,outz]
+            out = out_out[index_min]
+            angle = angles[index_min]
+        '''
+        loss = loss_frobenius(R, out)
 
+        angle_errors.append(angle)
 
-        angle = np.min([anglex, angley, anglez])
-        angle_errors.append(angle.item())
-
-        if(lossfunc is None):
-            loss = loss_frobenius(R, out)
-        else:
-            loss = lossfunc(R,out)
-        
         epoch_loss.append(loss.item())
 
-        opt.step()
         loss.backward()
+        opt.step()
 
     return epoch_loss, angle_errors
 
 
-def test_SO3(model, opt, dl_eval, device, lossfunc = None):
+def test_SO3(model, opt, dl_eval, device, lossfunc = None, rot_rep = "SVD"):
     '''
     Either for validation or for testing
 
@@ -183,7 +301,7 @@ def test_SO3(model, opt, dl_eval, device, lossfunc = None):
     with torch.no_grad():
         val_loss = []
         angle_errors = []
-        for img, ex, _, _, _, _ in dl_eval:
+        for img, ex, _, _, _ in dl_eval:
 
             img = img.to(device)
             # rotation matrix
@@ -193,37 +311,27 @@ def test_SO3(model, opt, dl_eval, device, lossfunc = None):
 
             out = model(img)
             #out = compute_rotation_matrix_from_ortho6d(out)
-            out = symmetric_orthogonalization(out)
+            if(rot_rep == "SVD"):
+                out = symmetric_orthogonalization(out)
+            elif(rot_rep == "6D"):
+                out = compute_rotation_matrix_from_ortho6d(out)
+            elif(rot_rep == "5D"):
+                out = compute_rotation_matrix_from_ortho5d(out)
+            elif(rot_rep == "quat"):
+                out = compute_rotation_matrix_from_quaternion(out)
+
 
             angle = angle_error(out, R).mean().item()
+            angle_errors.append(angle)
 
-            outx,outy,outz = rotate_by_180(out)
-
-            anglex = angle_error(outx.to('cuda').double(), R).mean().item()
-            angley = angle_error(outy.to('cuda').double(), R).mean().item()
-            anglez = angle_error(outz.to('cuda').double(), R).mean().item()
-
-
-            for i in out.size():
-                if(anglex < angle):
-                    out[i] = outx[i]
-
-                if(angley < angle):
-                    out[i] = outy[i]
-
-                if(anglez < angle):
-                    out[i] = outz[i]
-
-            angle = np.min([anglex, angley, anglez])
-            angle_errors.append(angle.item())
-
+            
             if(lossfunc is None):
                 loss = loss_frobenius(R, out)
             else:
                 loss = lossfunc(R,out)
                 
             val_loss.append(loss.item())
-            angle_errors.append(angle_error(out, R).mean().item())
+
 
     return val_loss, angle_errors
 
@@ -241,12 +349,13 @@ def load_network(path, model, opt, model_name, out_dim, numclasses):
 
 
 # Brief setup
-rot_rep = 'SVD'
-rot_dim = 6
-num_classes = 1
-batch_size = 64
+
+
+rot_rep = args.rot_rep
+batch_size = 512
 dataset = 'SO3'
-dataset_dir = '../data/datasets/'
+dataset_dir = 'datasetSO3/'
+rot_dim = {"SVD":9, "5D": 5, "6D": 6,"quat": 4}
 epochs = 50
 drop_epochs = []
 save_interval = 1
@@ -255,7 +364,7 @@ ngpu = 4
 lr = 0.05
 #lossfunc =GeodesicLoss()
 lossfunc = None
-DIR = 'logs'
+DIR = rot_rep + '/logs'
 # automatically find the latest run folder
 n = len(glob.glob(DIR + '/run*'))
 NEW_DIR = 'run' + str(n + 1).zfill(3)
@@ -277,23 +386,19 @@ print("cuda: ", torch.cuda.is_available())
 print("count: ", torch.cuda.device_count())
 print("names: ", device_names)
 print("device ids:", devices)
-classes = ['bathtub', 'bed', 'desk', 'dresser',
-           'monitor', 'night_stand', 'chair', 'sofa', 'table', 'toilet']
-dl_train, dl_eval = get_modelnet_loaders(
-    dataset, batch_size, dataset_dir, classes)
 
 
+dl_train, dl_eval = get_modelnet_loader(batch_size,True, dataset_dir = '../data/')
 
 model = ResnetRS.create_pretrained(
-    model_name, in_ch=3, num_classes=num_classes)
+    model_name, in_ch=3,out_features = rot_dim[rot_rep], num_classes=rot_dim[rot_rep],)
 
 model = nn.DataParallel(model, device_ids=devices)
 model = model.to(device)
 opt = torch.optim.SGD(model.parameters(), lr=lr)
 
 curr_epoch = 47
-resume = True
-
+resume = False
 LOAD_PATH = '/logs/run026/saved_models'
 if(resume):
     NAME = str(model_name) + '_state_dict_{}.pkl'.format(curr_epoch)
@@ -309,7 +414,7 @@ writer_train = SummaryWriter(
     log_dir=os.path.join(SAVE_PATH, 'train'), comment=f"_{model_name}_{opt.__class__.__name__}_{lr}_train")
 
 
-tren,testing,vinkel,testvinkel,tid = [],[],[],[],[]
+
 for e in range(curr_epoch, epochs):
     verbose = e % int(save_interval) == 0 or e == (epochs - 1)
 

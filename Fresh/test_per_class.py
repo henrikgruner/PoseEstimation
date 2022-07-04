@@ -22,7 +22,12 @@ from torch.utils.tensorboard import SummaryWriter
 import torchvision
 from torch import Tensor
 import matplotlib.pyplot as plt
+plt.rc('xtick', labelsize=12) 
+plt.rc('ytick', labelsize=12) 
+font = {'family' : 'normal',
+        'size'   : 12}
 
+plt.rc('font', **font)
 
 # TODO - Save net per tenth
 
@@ -57,6 +62,22 @@ def angle_error(t_R1, t_R2):
     angle = torch.acos(cos_angle)
     return angle * (180 / np.pi)
 
+def compute_rotation_matrix_from_ortho6d(poses):
+    """
+    Code from https://github.com/papagina/RotationContinuity
+    On the Continuity of Rotation Representations in Neural Networks
+    Zhou et al. CVPR19
+    https://zhouyisjtu.github.io/project_rotation/rotation.html
+    """
+    assert poses.shape[-1] == 6
+    x_raw = poses[..., 0:3]
+    y_raw = poses[..., 3:6]
+    x = x_raw / torch.norm(x_raw, p=2, dim=-1, keepdim=True)
+    z = torch.cross(x, y_raw, dim=-1)
+    z = z / torch.norm(z, p=2, dim=-1, keepdim=True)
+    y = torch.cross(z, x, dim=-1)
+    matrix = torch.stack((x, y, z), -1)
+    return matrix
 
 def test_angle_SO3(model, opt, dl_eval, device):
     '''
@@ -68,7 +89,7 @@ def test_angle_SO3(model, opt, dl_eval, device):
     with torch.no_grad():
 
         angle_errors = []
-        for i, (img, ex, cs, di, gg, dd) in enumerate(dl_eval):
+        for i, (img, ex, cs, di, dd) in enumerate(dl_eval):
 
             img = img.to(device)
             # rotation matrix
@@ -78,7 +99,8 @@ def test_angle_SO3(model, opt, dl_eval, device):
 
             out = model(img)
             # Does not need to reshape
-            out = symmetric_orthogonalization((out.view(-1, 3, 3)))
+            #out = symmetric_orthogonalization((out.view(-1, 3, 3)))
+            out = compute_rotation_matrix_from_ortho6d(out)
             angle = angle_error(out, R).mean().item()
             original_angle = angle
             if(angle > 150):
@@ -92,8 +114,8 @@ def test_angle_SO3(model, opt, dl_eval, device):
                     'cuda').double(), R).mean().item()
                 angle = np.min([anglex, angley, anglez])
 
-                print(round(original_angle), round(angle), round(
-                    anglex), round(angley), round(anglez))
+                #print(round(original_angle), round(angle), round(
+                #    anglex), round(angley), round(anglez))
 
             angle_errors.append(angle)
 
@@ -115,7 +137,7 @@ def load_network(path, model, opt, model_name):
 # Brief setup
 batch_size = 1
 dataset = 'SO3'
-dataset_dir = '../data/datasets/'
+dataset_dir = 'datasetSO3/'
 
 
 model_name = 'resnetrs101'
@@ -138,8 +160,8 @@ print("device ids:", devices)
 def test_angle(path, save_path, class_type='chair'):
     dl_eval = get_eval_loader(dataset, batch_size, dataset_dir, [class_type])
     model = ResnetRS.create_pretrained(
-        model_name, in_ch=3, num_classes=1)
-
+        model_name, in_ch=3, num_classes=6)
+    print(model)
     model = nn.DataParallel(model, device_ids=devices)
     model = model.to(device)
     opt = torch.optim.SGD(model.parameters(), lr=0)
@@ -156,7 +178,7 @@ def test_angle(path, save_path, class_type='chair'):
     plt.xlabel('Mean angle error')
     plt.ylabel('Frequency')
 
-    plt.title(class_type)
+    plt.title(class_type, fontdict={'fontsize': 18})
     plt.hist(val_angle_errors, bins=50)
     plt.savefig(class_type)
     plt.close()
@@ -164,8 +186,8 @@ def test_angle(path, save_path, class_type='chair'):
 
 
 classes = ['bathtub', 'table']
-paths = ['../Fresh/logs/run026/saved_models/resnetrs101_state_dict_47.pkl']
-save_paths = ['run-026-epoch47-all']
+paths = ['resnetrs101_state_dict_49.pkl']
+save_paths = ['run-26-epoch47-all']
 
 
 # automatically find the latest run folder
@@ -181,17 +203,22 @@ for i, path in enumerate(paths):
         if not os.path.isdir(save_paths[i]):
             os.makedirs(save_paths[i])
 
-        val_angle_errors = test_angle(path, save_paths[i], c)
+        val_angle_errors = np.array(test_angle(path, save_paths[i], c))
 
         all_angles.extend(val_angle_errors)
         data = dict()
-        data["row1"] = [round(np.mean(
-            val_angle_errors), 2), round(np.median(val_angle_errors), 2), round(np.std(val_angle_errors), 2)]
+        data['mean'] = [round(np.mean(
+            val_angle_errors), 2)]
+        data['median'] = [round(np.median(val_angle_errors), 2)]
+        data['std'] = [round(np.std(val_angle_errors), 2)]
+        data['acc6'] = [round((val_angle_errors < 30).sum() / len(val_angle_errors),4)]
+        data['acc12'] = [round((val_angle_errors < 15).sum() / len(val_angle_errors),4)]
+        data['acc24'] = [round((val_angle_errors < 7.5).sum() / len(val_angle_errors),4)]
+        #data["row1"] = [round(np.mean(
+        #    val_angle_errors), 2), round(np.median(val_angle_errors), 2), round(np.std(val_angle_errors), 2), round((val_angle_errors < 30).sum() / len(val_angle_errors),4), round((val_angle_errors < 15).sum() / len(val_angle_errors),4), round((val_angle_errors < 7.5).sum() / len(val_angle_errors),4)]
 
         texdata = "\\hline\n"
         for label in sorted(data):
-            if label == "z":
-                texdata += "\\hline\n"
             texdata += f"{label} & {' & '.join(map(str,data[label]))} \\\\\n"
 
         print(texdata, end="")
