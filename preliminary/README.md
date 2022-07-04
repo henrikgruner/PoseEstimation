@@ -3,7 +3,7 @@ The code is a simple autoencoder structure which takes in a randomly rotated coo
 homeomorphic, hence a mapping function is needed. The code in this section is meant to be a comparison between mapping functions. The code uses a simple feed-forward network (MLP) with two hidden layers of 128 and 64 units.
 
 ### Model architecture overview
-![Overview](preliminary/overview.png)
+![overview](preliminary/overview.png)
 
 ### Mapping functions:
 
