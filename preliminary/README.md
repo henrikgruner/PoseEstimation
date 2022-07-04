@@ -21,5 +21,6 @@ To run the code, simply use
 python3 main.py
 ```
 Three data sets will be generated with 30 000 train samples and 6 000 test samples each. One data set with 45 degrees maximum rotation, another with 90 degrees max, and lastly one with full rotations allowed. Plots will be generated of the mean angle error for each rotation. An example is shown below:
+
 ![overview](https://github.com/henrikgruner/PoseEstimation/blob/master/preliminary/180.png)
 
