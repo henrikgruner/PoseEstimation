@@ -49,6 +49,22 @@ def combine(R, tx,ty,tz, device='cuda'):
 
     return T_pred
 
+def get_scene_parameters():
+    '''
+    camera is a dict with the following values:
+    - Focal length
+    - Sensor width
+    - Img res
+    Need
+    - f_x, f_y, v_x, v_y and v_z
+    '''
+    sw = 36
+    img_res = 320
+    flen = 50
+    ppm = sw / img_res
+    fx = fy = flen / ppm
+
+    return fx, fy
 
 def calculate_T_pred(model_output, T_init, device, rot_repr='SVD'):
     '''
@@ -72,12 +88,7 @@ def calculate_T_pred(model_output, T_init, device, rot_repr='SVD'):
 
     R_k = T_init[:, :3, :3]
 
-    flen = 50
-    sw = 36
-    img_res = 320
-
-    ppm = sw / img_res
-    fx = fy = flen / ppm
+    fx, fy = get_scene_parameters()
 
     z_k = T_init[:, 2, 3]
 
