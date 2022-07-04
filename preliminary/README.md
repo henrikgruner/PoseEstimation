@@ -13,6 +13,8 @@ homeomorphic, hence a mapping function is needed. The code in this section is me
 
 
 ## Model architecture overview
+The parametrization step in the figure is the same as the mapping procedure. Hence the backpropagation is modified to find the gradients of each mapping function as well, effectively requiring matrix backpropagation. Luckily, PyTorch takes care of gradients automatically. 
+
 ![overview](https://github.com/henrikgruner/PoseEstimation/blob/master/preliminary/overview.png)
 
 ## To run 
