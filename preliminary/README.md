@@ -4,6 +4,7 @@ homeomorphic, hence a mapping function is needed. The code in this section is me
 
 ### Mapping functions:
 
+1. Euler angles: $f \in \mathbb{R}^3$
 
 <ol>
   <li>Euler angles: $$f \in \mathbb{R}^3$$</li>
