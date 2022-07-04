@@ -26,40 +26,6 @@ Nettverk:
 '''
 
 
-def save_network(epoch, model, opt, model_name, path):
-    opt_name = opt.__class__.__name__
-
-    NAME = str(model_name) + '_state_dict_{}.pkl'.format(epoch)
-    PATH = os.path.join(path, NAME)
-
-    torch.save({
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': opt.state_dict(),
-    }, PATH)
-
-def angle_error(t_R1, t_R2):
-    ret = torch.empty((t_R1.shape[0]), dtype=t_R1.dtype, device=t_R1.device)
-    rotation_offset = torch.matmul(
-        t_R1.transpose(1, 2).double(), t_R2.double())
-    tr_R = torch.sum(rotation_offset.view(-1, 9)
-                     [:, ::4], axis=1)  # batch trace
-    cos_angle = (tr_R - 1) / 2
-    if torch.any(cos_angle < -1.1) or torch.any(cos_angle > 1.1):
-        raise ValueError(
-            "angle out of range, input probably not proper rotation matrices")
-    cos_angle = torch.clamp(cos_angle, -1, 1)
-    angle = torch.acos(cos_angle)
-    return angle * (180 / np.pi)
-    
-def load_network(path, model, opt, model_name, out_dim, numclasses):
-    modelcheckpoint = torch.load(path)
-
-    model.load_state_dict(modelcheckpoint['model_state_dict'])
-    opt.load_state_dict(modelcheckpoint['optimizer_state_dict'])
-    epoch = modelcheckpoint['epoch']
-
-    return model, opt, epoch
 
 
 def sanity(gt_img, init_imgs, gt_ex, init_ex, model_ex, cad_ids, class_ids):
