@@ -5,7 +5,9 @@ import os
 from os.path import join as pjoin
 import numpy as np
 from pointnet import PointNet2_cls
-
+import sys
+sys.path.append("../")
+from representations import *
 
 
 def symmetric_orthogonalization(x):
@@ -145,19 +147,12 @@ def compute_rotation_matrix_from_quaternion(quaternion):
     return matrix    
 
 class Model(nn.Module):
-    def __init__(self, out_rotation_mode="svd"):
+    def __init__(self, representation="SVD"):
         super(Model, self).__init__()
-        self.out_rotation_mode = out_rotation_mode
-        if(out_rotation_mode == "svd"):
-            self.out_channel = 9
-        elif(out_rotation_mode == "6D"):
-            self.out_channel = 6
-        elif(out_rotation_mode == "5D"):
-            self.out_channel = 5
-        elif(out_rotation_mode == "quat"):
-            self.out_channel = 4
-        elif(out_rotation_mode == "euler"):
-            self.out_channel = 3
+        self.representation = representation
+        self.dimension = {"SVD":9, "6D":6, "5D": 5, "Quat": 4, "Euler": 3, "Direct": 9}
+        self.func = {"SVD":symmetric_orthogonalization, "6D":compute_rotation_matrix_from_ortho6d, "5D": compute_rotation_matrix_from_ortho5d, "Quat": compute_rotation_matrix_from_quaternion, "Euler": compute_rotation_matrix_from_euler}
+        self.out_channel = self.dimension[representation]
 
 
         self.model = PointNet2_cls(self.out_channel)
@@ -166,19 +161,17 @@ class Model(nn.Module):
 
     def forward(self, input):
 
-        out_nd = self.model(input)
+        x = self.model(input)
 
 
-        if(self.out_rotation_mode == "svd"):
-            out_rmat = symmetric_orthogonalization(out_nd)
-        elif(self.out_rotation_mode == "6D"):
-            out_rmat = compute_rotation_matrix_from_ortho6d(out_nd)
-        elif(self.out_rotation_mode == "5D"):
-            out_rmat = compute_rotation_matrix_from_ortho5d(out_nd)
-        elif(self.out_rotation_mode == "quat"):
-            out_rmat = compute_rotation_matrix_from_quaternion(out_nd)
-        elif(self.out_rotation_mode == "euler"):
-            out_rmat = compute_rotation_matrix_from_euler(out_nd)
+        if(self.representation == "Direct"):
+            out = x.view(-1,3,3)
+        else:
+            try:
+                out = self.func[self.representation](x)
+            except Exception as err:
+                print("Rotation could not be found")
+            
     
 
-        return out_rmat
+        return out
