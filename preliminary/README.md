@@ -3,11 +3,14 @@ The code is a simple autoencoder structure which takes in a randomly rotated coo
 homeomorphic, hence a mapping function is needed. The code in this section is meant to be a comparison between mapping functions. The code uses a simple feed-forward network (MLP) with two hidden layers of 128 and 64 units.
 
 ### Mapping functions:
-\begin{enumerate}
-    \item Euler angles: $f \in \mathbb{R}^3$
-    \item Quaternions: $f \in \mathbb{R}^4$
-    \item Gram Schmidt orthogonalizaion in 5D: $f\in \mathbb{R}^5$
-    \item Gram Schmidt orthogonalization in 6D: $f \in \mathbb{R}^6$
-    \item Symmetric orthogonalization via SVD: $f \in \mathbb{R}^9$
-    \item Direct regression without orthogonalization: $f \in \mathbb{R}^9$. This is a true rotation representation, as there is no guarantee it will be orthogonal. It is included nonetheless to see how well the network is able to perform without a parametrization function. The output is simply reshaped into $3 \times 3$. 
-\end{enumerate}
+
+
+<ol>
+  <li>Euler angles: $f \in \mathbb{R}^3$</li>
+  <li>Quaternions: $f \in \mathbb{R}^4</li>
+  <li>Gram Schmidt orthogonalizaion in 5D: $f\in \mathbb{R}^5</li>
+  <li> Gram Schmidt orthogonalization in 6D: $f \in \mathbb{R}^</li>
+  <li> Symmetric orthogonalization via SVD: $f \in \mathbb{R}^9</li>
+    <li>Direct regression without orthogonalization: $f \in \mathbb{R}^9$. This is not a true rotation representation, as there is no guarantee it will be orthogonal. It is included nonetheless to see how well the network is able to perform without a parametrization function. The output is simply reshaped into $3 \times 3$ </li>
+</ol>
+
