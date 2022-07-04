@@ -18,6 +18,7 @@ My best result was 5.7 degrees, whilst [2] achieves 4.3 degrees. The original au
 Ariz, M., Bengoechea, J. J., Villanueva, A., & Cabeza, R. (2016).
 A novel 2D/3D database with automatic face annotation for head tracking and pose estimation.
 Computer Vision and Image Understanding, 148, 201-210.
+
 <a id="2">[2]</a> 
 Mohlin, D., Sullivan, J., & Bianchi, G. (2020).
 Probabilistic orientation estimation with matrix fisher distributions.
