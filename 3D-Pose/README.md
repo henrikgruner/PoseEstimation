@@ -1,13 +1,8 @@
 # 3D pose estimation
 
 ## Data set
-The data set used was the ModelNet10-SO(3) created by [1]. The data set can be downloaded from https://drive.google.com/file/d/17GLZbNTDq8B_MOgrV1TiJPoqcm_oQ_mK/view?usp=sharing, with the corresponding github repo https://github.com/leoshine/Spherical_Regression#ModelNet10-SO3-Dataset. The format is stored on a lmdb format, and for my usage was turned into pickle format. To do this, run
+The data set used was the ModelNet10-SO(3) created by [1]. The data set can be downloaded from https://drive.google.com/file/d/17GLZbNTDq8B_MOgrV1TiJPoqcm_oQ_mK/view?usp=sharing, with the corresponding github repo https://github.com/leoshine/Spherical_Regression#ModelNet10-SO3-Dataset. The format is stored on a lmdb format, and for my usage was turned into pickle format. Put the downloaded files into the dataset folder. Further instructions can be found there.
 
-```
-python3 dataset.py
-```
-
-which will generate pickle classes. Note that this takes upwards of 200-300 GB of memory, hence one can also use [1] method. However this requires changing the code in my project. 
 
 ## Network overview
 The network used was a ResNet-RS101 [2], and an overview is illustrated below, with SVD as the rotation representation. 
