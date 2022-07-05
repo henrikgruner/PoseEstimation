@@ -1,40 +1,202 @@
-lmdb==1.3.0
-matplotlib==3.5.1
-numpy==1.22.3
-Pillow==9.1.0
-torch==1.10.1+cu113
-absl-py==0.11.0
+absl-py==1.1.0
+alabaster @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/alabaster/alabaster-0.7.12
+albumentations==1.1.0
+ansitable==0.9.6
+appdirs @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/appdirs/appdirs-1.4.4
+asn1crypto @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/asn1crypto/asn1crypto-1.4.0
 astunparse==1.6.3
-cachetools==4.1.1
-certifi==2020.6.20
+atomicwrites @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/atomicwrites/atomicwrites-1.4.0
+attrs @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/attrs/attrs-20.2.0
+Babel @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/Babel/Babel-2.8.0
+bcrypt @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/bcrypt/bcrypt-3.2.0
+beautifulsoup4==4.11.1
+bitstring @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/bitstring/bitstring-3.1.7
+blist @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/blist/blist-1.3.6
+CacheControl @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/CacheControl/CacheControl-0.12.6
+cachetools==5.2.0
+cachy @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/cachy/cachy-0.3.0
+certifi==2022.5.18.1
+cffi @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/cffi/cffi-1.14.3
 chardet==3.0.4
-gast==0.3.3
-google-auth==1.23.0
-google-auth-oauthlib==0.4.2
+charset-normalizer==2.0.12
+cleo==0.8.1
+click @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/click/click-7.1.2
+clikit==0.6.2
+colorama @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/colorama/colorama-0.4.3
+colored==1.4.3
+commonmark==0.9.1
+configparser==5.2.0
+crashtest==0.3.1
+cryptography @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/cryptography/cryptography-3.1.1
+cycler==0.11.0
+Cython @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/Cython/Cython-0.29.21
+decorator @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/decorator/decorator-4.4.2
+distlib @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/distlib/distlib-0.3.1
+docopt @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/docopt/docopt-0.6.2
+docutils @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/docutils/docutils-0.16
+ecdsa @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/ecdsa/ecdsa-0.16.0
+efficientnet-pytorch==0.7.1
+einops==0.4.1
+filelock @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/filelock/filelock-3.0.12
+flatbuffers==1.12
+flit @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/flit/flit-3.0.0
+flit_core @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/flitcore/flit_core-3.0.0
+fonttools==4.28.5
+freetype-py==2.2.0
+fsspec @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/fsspec/fsspec-0.8.4
+future @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/future/future-0.18.2
+gast==0.4.0
+gdown==4.4.0
+google-auth==2.7.0
+google-auth-oauthlib==0.4.6
 google-pasta==0.2.0
-grpcio==1.33.2
-h5py==2.10.0
-idna==2.10
-importlib-metadata==2.0.0
+grpcio==1.46.3
+h5py==3.7.0
+html5lib @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/html5lib/html5lib-1.1
+idna==3.3
+imageio==2.16.1
+imageio-ffmpeg==0.4.7
+imagesize @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/imagesize/imagesize-1.2.0
+importlib-metadata==4.11.4
+iniconfig @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/iniconfig/iniconfig-1.0.1
+intervaltree @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/intervaltree/intervaltree-3.1.0
+intreehooks @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/intreehooks/intreehooks-1.0
+ipaddress @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/ipaddress/ipaddress-1.0.23
+jeepney==0.4.3
+Jinja2 @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/Jinja2/Jinja2-2.11.2
+joblib @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/joblib/joblib-0.17.0
+jsonschema @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/jsonschema/jsonschema-3.2.0
+keras==2.9.0
 Keras-Preprocessing==1.1.2
-Markdown==3.3.3
-numpy==1.18.5
-oauthlib==3.1.0
+keyring @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/keyring/keyring-21.4.0
+keyrings.alt @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/keyringsalt/keyrings.alt-4.0.0
+kiwisolver==1.3.2
+liac-arff @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/liacarff/liac-arff-2.5.0
+libclang==14.0.1
+lmdb==1.3.0
+lockfile @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/lockfile/lockfile-0.12.2
+Markdown==3.3.7
+MarkupSafe @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/MarkupSafe/MarkupSafe-1.1.1
+matplotlib==3.5.1
+mock @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/mock/mock-4.0.2
+more-itertools @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/moreitertools/more-itertools-8.5.0
+mpmath==1.2.1
+msgpack @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/msgpack/msgpack-1.0.0
+netaddr @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/netaddr/netaddr-0.8.0
+netifaces @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/netifaces/netifaces-0.10.9
+networkx==2.7.1
+nose @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/nose/nose-1.3.7
+numpy==1.22.4
+oauthlib==3.2.0
+opencv-python==4.5.5.64
+opencv-python-headless==4.5.5.64
 opt-einsum==3.3.0
-protobuf==3.13.0
+packaging==21.3
+pandas==1.3.5
+paramiko @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/paramiko/paramiko-2.7.2
+pastel==0.2.1
+pathlib2 @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pathlib2/pathlib2-2.3.5
+paycheck @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/paycheck/paycheck-1.0.2
+pbr @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pbr/pbr-5.5.0
+perceiver-pytorch==0.8.3
+pexpect @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pexpect/pexpect-4.8.0
+Pillow==9.1.0
+pkginfo @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pkginfo/pkginfo-1.5.0.1
+pluggy @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pluggy/pluggy-0.13.1
+plyfile==0.7.4
+poetry @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/poetry/poetry-1.1.3
+poetry-core @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/poetrycore/poetry-core-1.0.0
+protobuf==3.19.4
+psutil @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/psutil/psutil-5.7.2
+ptyprocess==0.6.0
+py @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/py/py-1.9.0
+py-expression-eval @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/py_expression_eval/py_expression_eval-0.3.10
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
-requests==2.24.0
-requests-oauthlib==1.3.0
-rsa==4.6
-scipy==1.5.3
-six==1.15.0
-tensorboard==2.3.0
-tensorboard-plugin-wit==1.7.0
-tensorflow==2.3.1
-tensorflow-estimator==2.3.0
+pycparser @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pycparser/pycparser-2.20
+pycrypto @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pycrypto/pycrypto-2.6.1
+pyglet==1.5.23
+Pygments @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/Pygments/Pygments-2.7.1
+pygount==1.4.0
+pylev @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pylev/pylev-1.3.0
+PyNaCl @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/PyNaCl/PyNaCl-1.4.0
+PyOpenGL==3.1.0
+pyparsing==3.0.9
+pyquaternion==0.9.9
+pyrender==0.1.45
+pyrsistent @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pyrsistent/pyrsistent-0.17.3
+PySocks==1.7.1
+pytest @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pytest/pytest-6.1.1
+python-dateutil @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pythondateutil/python-dateutil-2.8.1
+pytoml @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pytoml/pytoml-0.1.21
+pytz @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/pytz/pytz-2020.1
+PyWavelets==1.3.0
+PyYAML==6.0
+qudida==0.0.4
+realrender==0.0.5
+regex @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/regex/regex-2020.10.11
+requests==2.28.0
+requests-oauthlib==1.3.1
+requests-toolbelt @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/requeststoolbelt/requests-toolbelt-0.9.1
+rich==12.3.0
+roma==1.2.5
+rsa==4.8
+scandir @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/scandir/scandir-1.10.0
+scikit-image==0.19.2
+scikit-learn==1.0.2
+scipy==1.7.3
+seaborn==0.11.2
+SecretStorage @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/SecretStorage/SecretStorage-3.1.2
+setuptools-scm @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/setuptools_scm/setuptools_scm-4.1.2
+shellingham @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/shellingham/shellingham-1.3.2
+simplegeneric @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/simplegeneric/simplegeneric-0.8.1
+simplejson @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/simplejson/simplejson-3.17.2
+six==1.16.0
+snowballstemmer @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/snowballstemmer/snowballstemmer-2.0.0
+sortedcontainers @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/sortedcontainers/sortedcontainers-2.2.2
+soupsieve==2.3.2.post1
+spatialmath-python==0.11
+Sphinx @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/Sphinx/Sphinx-3.2.1
+sphinx-bootstrap-theme @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/sphinxbootstraptheme/sphinx-bootstrap-theme-0.7.1
+sphinxcontrib-applehelp @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/sphinxcontribapplehelp/sphinxcontrib-applehelp-1.0.2
+sphinxcontrib-devhelp @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/sphinxcontribdevhelp/sphinxcontrib-devhelp-1.0.2
+sphinxcontrib-htmlhelp @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/sphinxcontribhtmlhelp/sphinxcontrib-htmlhelp-1.0.3
+sphinxcontrib-jsmath @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/sphinxcontribjsmath/sphinxcontrib-jsmath-1.0.1
+sphinxcontrib-qthelp @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/sphinxcontribqthelp/sphinxcontrib-qthelp-1.0.3
+sphinxcontrib-serializinghtml @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/sphinxcontribserializinghtml/sphinxcontrib-serializinghtml-1.1.4
+sphinxcontrib-websupport @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/sphinxcontribwebsupport/sphinxcontrib-websupport-1.2.4
+sympy==1.10.1
+tabulate @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/tabulate/tabulate-0.8.7
+tensorboard==2.9.1
+tensorboard-data-server==0.6.1
+tensorboard-plugin-wit==1.8.1
+tensorboardX==2.5
+tensorflow==2.9.1
+tensorflow-estimator==2.9.0
+tensorflow-gpu==2.7.0
+tensorflow-io-gcs-filesystem==0.26.0
 termcolor==1.1.0
-urllib3==1.25.11
-Werkzeug==1.0.1
-wrapt==1.12.1
-zipp==3.4.0
+tf-estimator-nightly==2.8.0.dev2021122109
+threadpoolctl @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/threadpoolctl/threadpoolctl-2.1.0
+tifffile==2022.3.25
+toml @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/toml/toml-0.10.1
+tomlkit==0.7.0
+torch==1.10.1+cu113
+torch-lr-finder==0.2.1
+torchaudio==0.10.1+cu113
+torchinfo==1.6.5
+torchsummary==1.5.1
+torchvision==0.11.2+cu113
+tqdm==4.64.0
+transforms3d==0.3.1
+trimesh==3.10.7
+typing_extensions==4.2.0
+ujson @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/ujson/ujson-4.0.1
+urllib3==1.26.9
+virtualenv @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/virtualenv/virtualenv-20.0.34
+wcwidth @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/wcwidth/wcwidth-0.2.5
+webencodings @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/webencodings/webencodings-0.5.1
+Werkzeug==2.1.2
+wrapt==1.14.1
+xlrd @ file:///tmp/eb_vegarde/Python/3.8.6/GCCcore-10.2.0/xlrd/xlrd-1.2.0
+zipp==3.8.0

@@ -155,7 +155,7 @@ print("count: ", torch.cuda.device_count())
 print("names: ", device_names)
 print("device ids:", devices)
 
-dl_train, dl_eval = get_upna_loaders(batch_size, True, '')
+#dl_train, dl_eval = get_upna_loaders(batch_size, True, '')
 
 model = ResnetRS.create_pretrained(
     model_name, in_ch=3, out_features = 9, num_classes=9)
