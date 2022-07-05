@@ -3,7 +3,8 @@
 ModelNet10 [2] is a collection of households objects in 3D. For application of 3D pose estimation from 2D images, the objects needs to be rendered(i.e., take an image). For an ease of comparison between data sets (rendering has many parameters), I used ModelNet10-SO3 created by [1]. Each object was rotated randomly 100 times, and an image is rendered from each. The annontations given are the rotation matrix, intrinsic matrix, in addition to the cad id and class index. For the test set, only 10 are created. 
 
 ## To download
-From the original author [2]
+From the original author [1]
+```
 wget http://isis-data.science.uva.nl/shuai/datasets/ModelNet10-SO3.tar.gz
 
 # unzip and overwrite ModelNet10-SO3 folder
