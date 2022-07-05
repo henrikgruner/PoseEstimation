@@ -146,7 +146,7 @@ SAVE_PATH, MODEL_SAVE_PATH = get_new_dir(rot_rep)
 device, devices = cuda_confirm()
 
 
-dl_train, dl_eval = get_modelnet_loader(batch_size, True , dataset_dir = dataset_dir)
+dl_train, dl_eval = get_modelnet_loaders(batch_size,dataset_dir,classes)
 
 model = ResnetRS.create_pretrained(
     model_name, in_ch=3,out_features = rot_dim, num_classes=rot_dim)

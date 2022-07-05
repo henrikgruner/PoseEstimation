@@ -60,7 +60,10 @@ def main(classes, filename, train=True):
 
             image, extrinsic, class_idx, hard, intrinsic, cad_idx = [], [], [], [], [], []
             gg += 1
-            curr_class = classes[gg]
+            try:
+                curr_class = classes[gg]
+            except Exception:
+                break
 
     df = pd.DataFrame()
     df['image'] = image
@@ -74,8 +77,9 @@ def main(classes, filename, train=True):
 
 
 if __name__ == '__main__':
-    classes = [['bathtub'], ['bed'], ['chair'], ['desk'], ['dresser'], [
-        'monitor'], ['night_stand'], ['sofa'], ['table'], ['toilet']]
+    #classes = [['bathtub'], ['bed'], ['chair'], ['desk'], ['dresser'], [
+    #    'monitor'], ['night_stand'], ['sofa'], ['table'], ['toilet']]
+    classes = [['bathtub']]
     filename_train = '_train.pkl'
     filename_eval = '_eval.pkl'
     main(classes, filename_train, True)

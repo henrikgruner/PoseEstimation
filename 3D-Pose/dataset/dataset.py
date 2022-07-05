@@ -173,7 +173,7 @@ class ModelNet6D(torch.utils.data.Dataset):
 
 
 
-def get_modelnet_loaders(dataset, batch_size, dataset_dir, classes, RGBD=False):
+def get_modelnet_loaders(batch_size, dataset_dir, classes):
 
     dataset_train = ModelNet10SO3(dataset_dir, classes, True)
     dataset_eval = ModelNet10SO3(dataset_dir, classes, False)

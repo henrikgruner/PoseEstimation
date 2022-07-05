@@ -4,6 +4,14 @@
 The data set used was the ModelNet10-SO(3) created by [1]. The data set can be downloaded from https://drive.google.com/file/d/17GLZbNTDq8B_MOgrV1TiJPoqcm_oQ_mK/view?usp=sharing, with the corresponding github repo https://github.com/leoshine/Spherical_Regression#ModelNet10-SO3-Dataset. The format is stored on a lmdb format, and for my usage was turned into pickle format. Put the downloaded files into the dataset folder. Further instructions can be found there.
 
 
+## To run
+The configs are stored in configs. An example config can be found as example.yaml. Note that I ran with 4 A100 40GB gpu's, hence the batch size should likely be modified for usage with fewer gpus. The training time is long, and might take 1-2 days, depending on the set up. 
+
+```
+python3 main.py -c [config_name] -dir [config_directory]
+```
+The default config is example.yaml and the default directory is configs. 
+
 ## Network overview
 The network used was a ResNet-RS101 [2], and an overview is illustrated below, with SVD as the rotation representation. 
 
