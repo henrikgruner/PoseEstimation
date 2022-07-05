@@ -94,6 +94,7 @@ def get_new_dir(rot_rep):
     MODEL_SAVE_PATH = os.path.join(SAVE_PATH, PATH)
     if not os.path.isdir(MODEL_SAVE_PATH):
         os.makedirs(MODEL_SAVE_PATH)
+    
     return SAVE_PATH, MODEL_SAVE_PATH
 
 def cuda_confirm():

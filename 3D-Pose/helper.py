@@ -233,30 +233,7 @@ def viz(path_svd, path_gs, classes):
         index +=1
 
 
-def get_new_dir(rot_rep):
-    DIR = rot_rep + '/logs'
-    n = len(glob.glob(DIR + '/run*'))
-    NEW_DIR = 'run' + str(n + 1).zfill(3)
-    SAVE_PATH = os.path.join(DIR, NEW_DIR)
 
-    # create new directory
-    PATH = 'saved_models'
-    MODEL_SAVE_PATH = os.path.join(SAVE_PATH, PATH)
-    if not os.path.isdir(MODEL_SAVE_PATH):
-        os.makedirs(MODEL_SAVE_PATH)
-
-def cuda_confirm():
-
-    device = torch.device("cuda" if(
-    torch.cuda.is_available()) else "cpu")
-    devices = [d for d in range(torch.cuda.device_count())]
-    device_names = [torch.cuda.get_device_name(d) for d in devices]
-
-    print("cuda: ", torch.cuda.is_available())
-    print("count: ", torch.cuda.device_count())
-    print("names: ", device_names)
-    print("device ids:", devices)
-    return device, devices
 
 
 
