@@ -1,6 +1,7 @@
 import sys
 sys.path.append('../models')
-sys.path.append('../data')
+sys.path.append('dataset/')
+sys.path.append('configs/')
 sys.path.append('..')
 sys.path.append('logs')
 sys.path.append('../CosyPose')
@@ -8,7 +9,7 @@ from model import ResnetRS
 from loss import loss_frobenius, rotate_by_180
 import torch
 import time
-from dataloader import get_modelnet_loader
+from config import config_parser, get_new_dir,cuda_confirm
 import torch.nn as nn
 import torch.nn.functional as F
 import ModelNetSO3
@@ -24,51 +25,17 @@ import torchvision
 import argparse
 from torch import Tensor 
 arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument("-r", "--rot_rep", type=str, default='SVD', help="category")
+arg_parser.add_argument('-c', type=str, default="example.yaml",
+                    help='config, default = resnet')
+arg_parser.add_argument('-dir', type=str, default="configs/",
+                    help='config, default = resnet')
 
 args = arg_parser.parse_args()
 
-def compute_geodesic_distance_from_two_matrices(m1, m2):
-    '''
-    Taken from:
-    https://github.com/airalcorn2/pytorch-geodesic-loss/blob/master/geodesic_loss.py
-    '''
-    batch=m1.shape[0]
-    m = torch.bmm(m1, m2.transpose(1,2)) #batch*3*3
-    
-    cos = (  m[:,0,0] + m[:,1,1] + m[:,2,2] - 1 )/2
-    cos = torch.min(cos, torch.autograd.Variable(torch.ones(batch).cuda()) )
-    cos = torch.max(cos, torch.autograd.Variable(torch.ones(batch).cuda())*-1 )
-    
-    
-    theta = torch.acos(cos)
-    
-    #theta = torch.min(theta, 2*np.pi - theta)
-    
-    
-    return theta
-
-
-def angle_error(t_R1, t_R2):
-    ret = torch.empty((t_R1.shape[0]), dtype=t_R1.dtype, device=t_R1.device)
-    rotation_offset = torch.matmul(
-        t_R1.transpose(1, 2).double(), t_R2.double())
-    tr_R = torch.sum(rotation_offset.view(-1, 9)
-                     [:, ::4], axis=1)  # batch trace
-    cos_angle = (tr_R - 1) / 2
-    if torch.any(cos_angle < -1.1) or torch.any(cos_angle > 1.1):
-        raise ValueError(
-            "angle out of range, input probably not proper rotation matrices")
-    cos_angle = torch.clamp(cos_angle, -1, 1)
-    angle = torch.acos(cos_angle)
-    return angle * (180 / np.pi)
 
 
 
-
-
-
-def train_SO3(model, opt, dl_train, device, lossfunc = None, rot_rep = "SVD"):
+def train_SO3(model, opt, dl_train, device, lossfunc = 'Frobenius', rot_rep = "SVD"):
     '''
         input:
         model : network
@@ -126,11 +93,11 @@ def train_SO3(model, opt, dl_train, device, lossfunc = None, rot_rep = "SVD"):
     return epoch_loss, angle_errors
 
 
-def test_SO3(model, opt, dl_eval, device, lossfunc = None, rot_rep = "SVD"):
+def test_SO3(model, opt, dl_eval, device, lossfunc = 'Frobenius', rot_rep = "SVD"):
     '''
     Either for validation or for testing
-
     '''
+
     func = {"SVD": symmetric_orthogonalization, "6D":compute_rotation_matrix_from_ortho6d, "5D": compute_rotation_matrix_from_ortho5d, "quat": compute_rotation_matrix_from_quaternion}
     model.eval()
     with torch.no_grad():
@@ -153,11 +120,13 @@ def test_SO3(model, opt, dl_eval, device, lossfunc = None, rot_rep = "SVD"):
             angle_errors.append(angle)
 
             
-            if(lossfunc is None):
+            if(lossfunc == 'Frobenius'):
                 loss = loss_frobenius(R, out)
+            elif(lossfunc == 'Geodesic'):
+                raise NotImplementedError
             else:
-                loss = lossfunc(R,out)
-                
+                raise NotImplementedError
+            
             val_loss.append(loss.item())
 
 
@@ -169,63 +138,34 @@ def test_SO3(model, opt, dl_eval, device, lossfunc = None, rot_rep = "SVD"):
 # Frobenius norm
 # Brief setup
 
-rot_rep = args.rot_rep
-batch_size = 512
-dataset = 'SO3'
-dataset_dir = 'datasetSO3/'
-rot_dim = {"SVD":9, "5D": 5, "6D": 6,"quat": 4}
-epochs = 50
-drop_epochs = []
-save_interval = 1
-model_name = 'resnetrs101'
-ngpu = 4
-lr = 0.05
-#lossfunc =GeodesicLoss()
-lossfunc = None
-DIR = rot_rep + '/logs'
-# automatically find the latest run folder
-n = len(glob.glob(DIR + '/run*'))
-NEW_DIR = 'run' + str(n + 1).zfill(3)
-
-SAVE_PATH = os.path.join(DIR, NEW_DIR)
-# create new directory
-
-PATH = 'saved_models'
-MODEL_SAVE_PATH = os.path.join(SAVE_PATH, PATH)
-if not os.path.isdir(MODEL_SAVE_PATH):
-    os.makedirs(MODEL_SAVE_PATH)
-
-device = torch.device("cuda" if(
-    torch.cuda.is_available() and ngpu > 0) else "cpu")
-devices = [d for d in range(torch.cuda.device_count())]
-device_names = [torch.cuda.get_device_name(d) for d in devices]
-
-print("cuda: ", torch.cuda.is_available())
-print("count: ", torch.cuda.device_count())
-print("names: ", device_names)
-print("device ids:", devices)
+lr, batch_size, opt_name, model_name, classes, rot_rep, rot_dim, epochs, drop_epochs, lossfunc, num_classes, dataset_dir, resume, save_interval, schedule = config_parser(args)
 
 
-dl_train, dl_eval = get_modelnet_loader(batch_size,True, dataset_dir = '../data/')
+SAVE_PATH, MODEL_SAVE_PATH = get_new_dir(rot_rep)
+
+device, devices = cuda_confirm()
+
+
+dl_train, dl_eval = get_modelnet_loader(batch_size, True , dataset_dir = dataset_dir)
 
 model = ResnetRS.create_pretrained(
-    model_name, in_ch=3,out_features = rot_dim[rot_rep], num_classes=rot_dim[rot_rep])
+    model_name, in_ch=3,out_features = rot_dim, num_classes=rot_dim)
 
 model = nn.DataParallel(model, device_ids=devices)
 model = model.to(device)
 opt = torch.optim.SGD(model.parameters(), lr=lr)
+curr_epoch = 0
 
-curr_epoch = 47
-resume = False
-LOAD_PATH = '/logs/run026/saved_models'
 if(resume):
-    NAME = str(model_name) + '_state_dict_{}.pkl'.format(curr_epoch)
-    LOAD_PATH = os.path.join(LOAD_PATH, NAME)
+    LOAD_PATH, curr_epoch = resume_training(model_name, args)
     model, opt, epoch = load_network(
-    '../Fresh/logs/run026/saved_models/resnetrs101_state_dict_47.pkl', model, opt, model_name, rot_dim, num_classes)
+    LOAD_PATH, model, opt, model_name, rot_dim, num_classes)
+
+    # Change learning rate if applicable
     for g in opt.param_groups:
         g['lr'] = lr
-    print("Resuming training from epoch: ", epoch)
+
+    print("Resuming training from epoch: ", curr_epoch)
 
 
 writer_train = SummaryWriter(

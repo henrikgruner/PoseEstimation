@@ -206,6 +206,27 @@ def symmetric_orthogonalization(x):
     return r
 
 
+def compute_geodesic_distance_from_two_matrices(m1, m2):
+    '''
+    Taken from:
+    https://github.com/airalcorn2/pytorch-geodesic-loss/blob/master/geodesic_loss.py
+    '''
+    batch=m1.shape[0]
+    m = torch.bmm(m1, m2.transpose(1,2)) #batch*3*3
+    
+    cos = (  m[:,0,0] + m[:,1,1] + m[:,2,2] - 1 )/2
+    cos = torch.min(cos, torch.autograd.Variable(torch.ones(batch).cuda()) )
+    cos = torch.max(cos, torch.autograd.Variable(torch.ones(batch).cuda())*-1 )
+    
+    
+    theta = torch.acos(cos)
+    
+    #theta = torch.min(theta, 2*np.pi - theta)
+    
+    
+    return theta
+
+
 def angle_error(t_R1, t_R2):
     ret = torch.empty((t_R1.shape[0]), dtype=t_R1.dtype, device=t_R1.device)
     rotation_offset = torch.matmul(

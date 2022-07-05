@@ -9,6 +9,34 @@ import pyrender
 import trimesh as tm
 os.environ['PYOPENGL_PLATFORM'] = 'egl'
 
+
+import sys
+sys.path.append('../models')
+sys.path.append('../data')
+sys.path.append('../6D')
+sys.path.append('..')
+sys.path.append('../CosyPose/')
+sys.path.append('../CosyPose/ModelNet40-norm-ply')
+sys.path.append('logs')
+from model import ResnetRS
+from loss import loss_frobenius
+import torch
+
+import time
+import torch.nn as nn
+import torch.nn.functional as F
+import ModelNetSO3
+import os
+
+from model import ResnetRS
+import numpy as np
+import glob
+from dataset import get_modelnet_loaders, get_eval_loader
+from torch.utils.tensorboard import SummaryWriter
+import torchvision
+from torch import Tensor
+import matplotlib.pyplot as plt
+
 def save_network(epoch, model, opt, model_name, path):
     opt_name = opt.__class__.__name__
 
@@ -32,65 +60,8 @@ def load_network(path, model, opt):
     return model, opt, epoch
 
 
-import sys
-sys.path.append('../models')
-sys.path.append('../data')
-sys.path.append('../6D')
-sys.path.append('..')
-sys.path.append('../CosyPose/')
-sys.path.append('../CosyPose/ModelNet40-norm-ply')
-sys.path.append('logs')
-from model import ResnetRS
-from loss import loss_frobenius
-import torch
-
-import time
-import torch.nn as nn
-import torch.nn.functional as F
-import ModelNetSO3
-import os
-from helper import save_network
-from model import ResnetRS
-import numpy as np
-import glob
-from dataset import get_modelnet_loaders, get_eval_loader
-from torch.utils.tensorboard import SummaryWriter
-import torchvision
-from torch import Tensor
-import matplotlib.pyplot as plt
 
 
-# TODO - Save net per tenth
-
-def symmetric_orthogonalization(x):
-    """
-    Code from https://github.com/amakadia/svd_for_pose
-    Maps 9D input vectors onto SO(3) via symmetric orthogonalization.
-    x: should have size [batch_size, 9]
-    Output has size [batch_size, 3, 3], where each inner 3x3 matrix is in SO(3).
-    """
-    m = x.view(-1, 3, 3)
-    u, s, v = torch.svd(m)
-    vt = torch.transpose(v, 1, 2)
-    det = torch.det(torch.matmul(u, vt))
-    det = det.view(-1, 1, 1)
-    vt = torch.cat((vt[:, :2, :], vt[:, -1:, :] * det), 1)
-    r = torch.matmul(u, vt)
-    return r
-
-
-def angle_error(t_R1, t_R2):
-    ret = torch.empty((t_R1.shape[0]), dtype=t_R1.dtype, device=t_R1.device)
-    rotation_offset = torch.matmul(t_R1.transpose(1, 2), t_R2)
-    tr_R = torch.sum(rotation_offset.view(-1, 9)
-                     [:, ::4], axis=1)  # batch trace
-    cos_angle = (tr_R - 1) / 2
-    if torch.any(cos_angle < -1.1) or torch.any(cos_angle > 1.1):
-        raise ValueError(
-            "angle out of range, input probably not proper rotation matrices")
-    cos_angle = torch.clamp(cos_angle, -1, 1)
-    angle = torch.acos(cos_angle)
-    return angle * (180 / np.pi)
 
 
 def test_angle_SO3(model, opt, dl_eval, device):
@@ -120,12 +91,6 @@ def test_angle_SO3(model, opt, dl_eval, device):
     return angle_errors
 
 
-def load_network(path, model):
-    modelcheckpoint = torch.load(path)
-
-    model.load_state_dict(modelcheckpoint['model_state_dict'])
-
-    return model
 
 def get_scene(mesh, ex, flen, img_res, sw):
     ex = np.linalg.inv(ex)
@@ -184,39 +149,6 @@ def render_image(mesh, ex, flen=112, sw=112, img_res=224):
     return color
 
 
-
-if __name__ == '__main__':
-
-    classes = ['bathtub', 'bed', 'desk', 'dresser',
-            'monitor', 'night_stand', 'chair', 'sofa', 'table', 'toilet']
-    classes = ['toilet']
-    path_svd = '../Fresh/logs/run026/saved_models/resnetrs101_state_dict_47.pkl'
-    path_gs = '../Fresh/logs/run027/saved_models/resnetrs101_state_dict_32.pkl'
-    if __name__ == '__main__':
-        viz(path_svd, path_gs, classes) 
-    # automatically find the latest run folder
-
-
-    # Brief setup
-    batch_size = 1
-    dataset = 'SO3'
-    dataset_dir = '../data/datasets/'
-
-
-    model_name = 'resnetrs101'
-
-
-    device = torch.device("cuda" if(
-        torch.cuda.is_available()) else "cpu")
-    devices = [d for d in range(torch.cuda.device_count())]
-    device_names = [torch.cuda.get_device_name(d) for d in devices]
-
-    print("cuda: ", torch.cuda.is_available())
-    print("count: ", torch.cuda.device_count())
-    print("names: ", device_names)
-    print("device ids:", devices)
-
-# SOFA
 
 
 def test_angle(path, save_path, class_type='chair'):
@@ -301,10 +233,49 @@ def viz(path_svd, path_gs, classes):
         index +=1
 
 
+def get_new_dir(rot_rep):
+    DIR = rot_rep + '/logs'
+    n = len(glob.glob(DIR + '/run*'))
+    NEW_DIR = 'run' + str(n + 1).zfill(3)
+    SAVE_PATH = os.path.join(DIR, NEW_DIR)
 
-        #print(ex)
-        #print(c_id)
-        #print(cam)
-        #print(cad_id)
-        #exit()
+    # create new directory
+    PATH = 'saved_models'
+    MODEL_SAVE_PATH = os.path.join(SAVE_PATH, PATH)
+    if not os.path.isdir(MODEL_SAVE_PATH):
+        os.makedirs(MODEL_SAVE_PATH)
+
+def cuda_confirm():
+
+    device = torch.device("cuda" if(
+    torch.cuda.is_available()) else "cpu")
+    devices = [d for d in range(torch.cuda.device_count())]
+    device_names = [torch.cuda.get_device_name(d) for d in devices]
+
+    print("cuda: ", torch.cuda.is_available())
+    print("count: ", torch.cuda.device_count())
+    print("names: ", device_names)
+    print("device ids:", devices)
+    return device, devices
+
+
+
+if __name__ == '__main__':
+
+    classes = ['bathtub', 'bed', 'desk', 'dresser',
+            'monitor', 'night_stand', 'chair', 'sofa', 'table', 'toilet']
+    classes = ['toilet']
+    path_svd = '../Fresh/logs/run026/saved_models/resnetrs101_state_dict_47.pkl'
+    path_gs = '../Fresh/logs/run027/saved_models/resnetrs101_state_dict_32.pkl'
+
+    viz(path_svd, path_gs, classes) 
+    # automatically find the latest run folder
+
+
+    # Brief setup
+    batch_size = 1
+    dataset = 'SO3'
+    dataset_dir = '../data/datasets/'
+
+
 

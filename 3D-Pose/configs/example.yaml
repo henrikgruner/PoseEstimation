@@ -1,0 +1,27 @@
+GENERAL:
+  EPOCHS: 50
+  BATCH_SZ: 512
+  LR: 0.05
+  LR_SCHEDULER: False
+  DROP_EPOCHS: []
+  OPT: SGD
+  ROTREP: SVD
+  LOSS : Frobenius
+  SAVE_INTERVAL: 5
+
+
+NETWORK:
+  NAME: resnetrs101
+  TRAIN: True
+  # Only accept True or False
+
+RESUME_TRAINING:
+  RESUME: False
+  PATH: 'saved_models_multiple/SVD/run001'
+  CURR_EPOCH: 30
+
+# Available classes : [['bathtub'], ['bed'], ['chair'], ['desk'], ['dresser'], [
+#        'monitor'], ['night_stand'], ['sofa'], ['table'], ['toilet']]
+DATASET:
+  DIR: "dataset/datasetSO3/"
+  CLASSES: ['bathtub', 'bed', 'desk', 'dresser', 'monitor', 'night_stand','chair','sofa','table'] 

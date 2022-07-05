@@ -177,13 +177,6 @@ def get_modelnet_loaders(dataset, batch_size, dataset_dir, classes, RGBD=False):
 
     dataset_train = ModelNet10SO3(dataset_dir, classes, True)
     dataset_eval = ModelNet10SO3(dataset_dir, classes, False)
-    # elif 'Cosy' in dataset:
-    #    dataset_train = CosyModelNet(
-    #        dataset_dir, classes, RGBD=False, train=True)
-    # dataset_eval = CosyModelNet(
-    #       dataset_dir, classes, RGBD=False, train=False)
-    # else:
-    #    print('Dataset does not exist')
 
     dataloader_train = torch.utils.data.DataLoader(
         dataset_train,
