@@ -17,4 +17,4 @@ As an ultimate experiment, a refinement process inspired by DeepIM and CosyPose 
 
 ## Loss function
 All models in all experiments uses the Frobenius norm
-$$\mathcal{L} = \norm{\hat{R}-R}_F^2$$
+$$\mathcal{L} = ||\hat{R}-R||_F^2$$
