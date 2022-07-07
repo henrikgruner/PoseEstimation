@@ -50,6 +50,7 @@ if __name__ == '__main__':
     classes = ['toilet']
     tt = ['train', 'test']
 
+
     for t in tt:
         for c in classes:
             imgs, depths, TCOs, init_imgs, depths_init, TCO_inits, ids, vertices = [
@@ -59,7 +60,11 @@ if __name__ == '__main__':
                 read_files = [os.path.join(read_dir, filename)
                               for filename in os.listdir(read_dir)]
                 for r in read_files:
-                    for _ in range(10):
+                    if(t == 'test'):
+                        samples = 5
+                    else:
+                        samples = 20
+                    for _ in range(samples):
                         cad_id = int(
                             r.split('/')[-1].split('.')[0].split('_')[-1])
 
